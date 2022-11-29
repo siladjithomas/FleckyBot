@@ -1,0 +1,55 @@
+@page "/discord/guilds"
+@attribute [Authorize]
+
+<PageTitle>Discord Guilds</PageTitle>
+
+@using Bot.Models
+@using Bot.Services
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@inject GuildService GuildService
+@inject Web.Services.UserService usrSvc
+
+<h1>List of Guilds</h1>
+
+<p>Here you can find all the guilds where the bot is present</p>
+
+@if (guilds == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Guild Id</th>
+                <th>Guild Name</th>
+                <th>Guild Admin Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var guild in guilds)
+            {
+                <tr>
+                    <th><a href="/discord/guilds/@guild.Id">@guild.GuildId</a></th>
+                    <td>@guild.GuildName</td>
+                    <td>@guild.GuildAdminName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Guild>? guilds;
+    private Web.Models.DiscordUserClaim? claim;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (httpContextAccessor.HttpContext != null)
+            claim = usrSvc.GetInfo(httpContextAccessor.HttpContext);
+        if (claim != null)
+            guilds = await GuildService.GetGuildsByAdminId(claim.UserId);
+    }
+}

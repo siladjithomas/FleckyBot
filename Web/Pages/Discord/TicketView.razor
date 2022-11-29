@@ -1,0 +1,67 @@
+@page "/discord/tickets/{Id}"
+@attribute [Authorize]
+
+<PageTitle>Tickets Manager</PageTitle>
+
+@using Bot.Models
+@using Bot.Services
+@inject TicketService TicketService
+
+@if (ticket == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>Ticket View</h1>
+
+    <div class="row">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ticket Id</th>
+                        <th>Ticket Name</th>
+                        <th>Is Open?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>@ticket.channelId</th>
+                        <td>@ticket.channelName</td>
+                        @if (ticket.isClosed)
+                        {
+                            <td>❌</td>
+                        }
+                        else
+                        {
+                            <td>✔</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col">
+            @foreach (var message in ticket.messages)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@message.userName</h5>
+                        <p class="card-text">@message.message</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+    private Ticket? ticket;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ticket = await TicketService.GetAsync(Id);
+    }
+}

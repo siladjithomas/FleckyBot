@@ -1,0 +1,49 @@
+@page "/discord/images"
+@attribute [Authorize]
+
+<PageTitle>Images</PageTitle>
+
+@using Bot.Models
+@using Bot.Services
+@inject ImageService ImageService
+
+<h1>Images in Database</h1>
+
+<p>Here is a list of pictures that are in the database.</p>
+
+@if (images == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Image Id</th>
+                <th>Image URL</th>
+                <th>Image Type</th>
+                <th>Preview</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var image in images)
+            {
+                <tr>
+                    <th><a href="/discord/images/@image.Id">@image.Id</a></th>
+                    <td>@image.url</td>
+                    <td>@image.type</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Image>? images;
+
+    protected override async Task OnInitializedAsync()
+    {
+        images = await ImageService.GetAsync();
+    }
+}

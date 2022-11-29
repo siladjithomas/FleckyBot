@@ -1,0 +1,30 @@
+@page "/discord/images/{Id}"
+@attribute [Authorize]
+
+<PageTitle>Image View</PageTitle>
+
+@using Bot.Models
+@using Bot.Services
+@inject ImageService ImageService
+
+@if(image == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>@Id</h2>
+    <h3>Type: @image.type</h3>
+    <p><img src="@image.url" alt="@image.type" /></p>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+    private Image? image;
+
+    protected override async Task OnInitializedAsync()
+    {
+        image = await ImageService.GetAsync(Id);
+    }
+}
