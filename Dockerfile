@@ -1,11 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS fleckybot-base
+WORKDIR /app
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS fleckybot-build
-WORKDIR /App
+COPY . /src
+WORKDIR /src
+RUN ls
+RUN dotnet build Web/Web.csproj -c Release -o /app/build
 
-COPY . ./
-RUN dotnet restore
-RUN dotnet publish -c Debug -o out
+FROM fleckybot-build AS fleckybot-publish
+RUN dotnet publish Web/Web.csproj -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS fleckybot
-WORKDIR /App
-COPY --from=fleckybot-build /App/out .
+FROM fleckybot-base as fleckybot
+WORKDIR /app
+COPY --from=fleckybot-publish /app/publish .
 ENTRYPOINT ["dotnet", "Web.dll"]
