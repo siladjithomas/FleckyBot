@@ -16,7 +16,6 @@ IHost host = Host.CreateDefaultBuilder(args)
             x.SelfDeaf = true;
             x.Port = 2333;
             x.Hostname = "127.0.0.1";
-            x.IsSsl = false;
             x.Authorization = "SecurePasswordHere";
         });
 

@@ -37,11 +37,10 @@ builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSect
 builder.Host.UseSystemd();
 
 // Set up Victoria for Discord
-builder.Services.AddLavaNode<XLavaPlayer>(x => {
+builder.Services.AddLavaNode(x => {
     x.SelfDeaf = true;
     x.Port = 2333;
     x.Hostname = "127.0.0.1";
-    x.IsSsl = false;
     x.Authorization = "SecurePasswordHere";
 });
 

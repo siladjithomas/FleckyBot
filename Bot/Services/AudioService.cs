@@ -4,20 +4,21 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Victoria;
-using Victoria.Enums;
-using Victoria.EventArgs;
+using Victoria.Node;
+using Victoria.Player;
+using Victoria.WebSocket.EventArgs;
 using Bot.Models;
 using Serilog;
 
 namespace Bot.Services;
 
 public sealed class AudioService {
-    private readonly LavaNode<XLavaPlayer> _lavaNode;
+    private readonly LavaNode _lavaNode;
     public readonly HashSet<ulong> VoteQueue;
     private readonly ConcurrentDictionary<ulong, CancellationTokenSource> _disconnectTokens;
     private readonly DiscordSocketClient _client;
 
-    public AudioService(LavaNode<XLavaPlayer> lavaNode, IServiceProvider provider) {
+    public AudioService(LavaNode lavaNode, IServiceProvider provider) {
         _lavaNode = lavaNode;
         _client = provider.GetRequiredService<DiscordSocketClient>();
         _disconnectTokens = new ConcurrentDictionary<ulong, CancellationTokenSource>();
