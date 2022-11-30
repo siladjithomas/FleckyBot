@@ -1,0 +1,30 @@
+{
+    "_id": {
+        "$oid": "123456789abcdefg"
+    },
+    "userId": 0,
+    "userName": "TestingUser#1234",
+    "channelId": 0,
+    "channelName": "help-needed",
+    "isClosed": true,
+    "messages": [
+        {
+            "messageId": 0,
+            "userId": 0,
+            "userName": "AdminUser#4321",
+            "message": "Where do you need help with?"
+        },
+        {
+            "messageId": 0,
+            "userId": 0,
+            "userName": "TestingUser#1234",
+            "message": "Here and there..."
+        },
+        {
+            "messageId": 0,
+            "userId": 0,
+            "userName": "AdminUser#4321",
+            "message": "That is it! Problem solved. Goodbye."
+        }
+    ]
+}

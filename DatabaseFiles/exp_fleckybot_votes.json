@@ -1,0 +1,22 @@
+{
+    "_id": {
+        "$oid": "123456789abcdefg"
+    },
+    "messageId": 0,
+    "userId": 0,
+    "userName": "TestingUser#1234",
+    "question": "Is this working?",
+    "userVotes": [
+        {
+            "userId": 0,
+            "userName": "AdminUser#4321",
+            "choise": true
+        },
+        {
+            "userId": 0,
+            "userName": "RandomUser#4312",
+            "choise": false
+        }
+    ],
+    "isOpen": false
+}

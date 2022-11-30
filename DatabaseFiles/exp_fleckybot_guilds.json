@@ -1,0 +1,83 @@
+{
+    "_id": {
+        "$oid": ""
+    },
+    "GuildId": 0,
+    "GuildName": "A Discord Server",
+    "GuildAdminId": 0,
+    "GuildAdminName": "TestUser#0000",
+    "GuildSystemMessagesChannel": {
+        "ChannelId": 0,
+        "ChannelName": "system-messages"
+    },
+    "GuildVotesChannel": {
+        "ChannelId": 0,
+        "ChannelName": "votes"
+    },
+    "GuildTicketChannel": {
+        "CategoryId": 0,
+        "CategoryName": "open tickets",
+        "GuildTicketGroups": [
+            {
+                "GroupId": 0,
+                "GroupName": "Admin Group",
+                "GroupType": "admin"
+            },
+            {
+                "GroupId": 0,
+                "GroupName": "Moderator Team",
+                "GroupType": "mod"
+            }
+        ]
+    },
+    "GuildRolesChannel": {
+        "ChannelId": 0,
+        "ChannelName": "choose-roles"
+    },
+    "GuildRoles": [
+        {
+            "RoleDisplayName": "Admin Team",
+            "RoleDescription": "Choose the team you are in",
+            "IsMultipleChoice": false,
+            "IsEnabled": false,
+            "SelectableRoles": [
+                {
+                    "RoleId": 0,
+                    "RoleName": "Admin Team"
+                }
+            ]
+        },
+        {
+            "RoleDisplayName": "Gender",
+            "RoleDescription": "Choose your gender.",
+            "IsMultipleChoice": false,
+            "IsEnabled": true,
+            "SelectableRoles": [
+                {
+                    "RoleId": 0,
+                    "RoleName": "Male"
+                },
+                {
+                    "RoleId": 0,
+                    "RoleName": "Female"
+                },
+                {
+                    "RoleId": 0,
+                    "RoleName": "Other"
+                }
+            ]
+        },
+        {
+            "RoleDisplayName": "DJ",
+            "RoleDescription": "Give yourself the DJ role",
+            "IsMultipleChoice": false,
+            "IsEnabled": true,
+            "SelectableRoles": [
+                {
+                    "RoleId": 0,
+                    "RoleName": "DJ"
+                }
+            ]
+        }
+    ]
+}

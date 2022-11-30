@@ -1,0 +1,9 @@
+{
+    "_id": {
+        "$oid": "123456789abcdef"
+    },
+    "channel": "bot-commands#0",
+    "author": "TestingBot#1234",
+    "message": "",
+    "timestamp": "01.01.2022 01:01:01 +00:00"
+}

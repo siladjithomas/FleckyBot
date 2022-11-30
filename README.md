@@ -21,6 +21,14 @@ Anyway, if you have anything to comment on my code (critique, additional comment
 
 ---
 
+## Database files
+
+I am currently using a MongoDB Database, the database template files are in the folder "DatabaseFiles". Please do keep in mind that those are only examples and are not real data files! Those are only here to visualise how it might look like. *Have fun trying to import those, it will fail!*
+
+I am planning to implement a MSSQL Database to this program to try out MSSQL and EF for database migrations as this is not possible with MongoDB.
+
+---
+
 ## .Net 7.0 version
 
 There is currently a .Net 7.0 branch but this will not get updated frequently like the main branch because of breaking changes in the specifications. Also, some packages used are still not updated for 7.0 so that might take a while to make it runnable or until I find a substitute.
