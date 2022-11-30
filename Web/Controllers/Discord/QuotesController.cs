@@ -38,7 +38,7 @@ public class QuotesController : ControllerBase
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> update(string id, Quote updatedBook)
+    public async Task<IActionResult> Update(string id, Quote updatedBook)
     {
         var quote = await _quoteService.GetAsync(id);
 

@@ -8,7 +8,7 @@ WorkingDirectory=/opt/Releases/fleckybot
 # This environment variable is necessary when dotnet isn't loaded for the specified user.
 # To figure out this value, run 'env | grep DOTNET_ROOT' when dotnet has been loaded into your shell.
 Environment=DOTNET_ROOT=/usr/lib/dotnet/dotnet6-6.0.108
-Environment=ASPNETCORE_ENVIRONMENT=Development
+Environment=ASPNETCORE_ENVIRONMENT=Production
 # systemd will run this executable to start the service
 # if /usr/bin/dotnet doesn't work, use `which dotnet` to find correct dotnet executable path
 ExecStart=/usr/bin/dotnet /opt/Releases/fleckybot/Web.dll

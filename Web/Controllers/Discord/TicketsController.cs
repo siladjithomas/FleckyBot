@@ -38,7 +38,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> update(string id, Ticket updatedTicket)
+    public async Task<IActionResult> Update(string id, Ticket updatedTicket)
     {
         var ticket = await _ticketService.GetAsync(id);
 

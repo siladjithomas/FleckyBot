@@ -19,8 +19,6 @@ using Victoria;
 using Serilog;
 using Serilog.Events;
 using System.IO;
-using DinkToPdf;
-using DinkToPdf.Contracts;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -98,13 +96,11 @@ builder.Services.AddQuartz(q =>
 
 //builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
-builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
-// Comment it on production because then we don't need it
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Only uncomment when used in debugging the API endpoint
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -119,8 +115,8 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    // Currently using the Hsts value of the nginx reverse proxy
+    //app.UseHsts();
 }
 else
 {
