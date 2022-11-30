@@ -1,5 +1,7 @@
 # FleckyBot - a bot for testing out stuff
 
+![my dog Flecky enjoying the snow](./flecky.png)
+
 *This is my personal bot that I am currently using to test out thing on the Discord platform. Written in C# on .Net 6.0. (originally on .Net 5.0) Running on my personal discord server.*
 
 ---
