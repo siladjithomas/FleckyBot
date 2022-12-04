@@ -40,7 +40,7 @@ builder.Services.AddLavaNode<XLavaPlayer>(x => {
     x.Port = 2333;
     x.Hostname = "127.0.0.1";
     x.IsSsl = false;
-    x.Authorization = "SecurePasswordHere";
+    x.Authorization = "SomeSecurePassword";
 });
 
 builder.Services.AddSingleton<UserService>();
@@ -99,8 +99,8 @@ builder.Services.AddQuartz(q =>
 builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 // Only uncomment when used in debugging the API endpoint
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

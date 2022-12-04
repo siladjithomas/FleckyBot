@@ -1,48 +1,15 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FleckyBot</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="discord/tickets">
-                        <span class="oi oi-list-rich" aria-hidden="true"></span> Tickets
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="discord/guilds">
-                        <span class="oi oi-list-rich" aria-hidden="true"></span> Guilds
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="discord/images">
-                        <span class="oi oi-list-rich" aria-hidden="true"></span> Images
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+﻿<ul>
+    <li><a href="" class="active">Home</a></li>
+    <AuthorizeView>
+        <Authorized>
+            <li><a href="discord/tickets">Tickets</a></li>
+            <li><a href="discord/guilds">Guilds</a></li>
+            <li><a href="discord/images">Images</a></li>
+            <li><a href="#">Hello @context.User.Identity?.Name!</a></li>
+            <li><a href="Account/LogOut">Logout</a></li>
+        </Authorized>
+        <NotAuthorized>
+            <li><a href="Account/Login">Login</a></li>
+        </NotAuthorized>
+    </AuthorizeView>
+</ul>
