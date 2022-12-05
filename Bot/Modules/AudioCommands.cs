@@ -24,26 +24,12 @@ public sealed class AudioCommands : InteractionModuleBase<SocketInteractionConte
     private readonly AudioService _audioService;
     private readonly DiscordSocketClient _client;
     private static readonly IEnumerable<int> Range = Enumerable.Range(1900, 2000);
-    private readonly SpotifyClient _spotifyClient;
-    private readonly YouTubeService _youtubeService;
 
     public AudioCommands(IServiceProvider service)
     {
         _lavaNode = service.GetRequiredService<LavaNode<XLavaPlayer>>();
         _audioService = service.GetRequiredService<AudioService>();
         _client = service.GetRequiredService<DiscordSocketClient>();
-
-        var config = SpotifyClientConfig
-            .CreateDefault()
-            .WithAuthenticator(new ClientCredentialsAuthenticator("", ""));
-
-        _spotifyClient = new SpotifyClient(config);
-
-        _youtubeService = new YouTubeService(new BaseClientService.Initializer()
-        {
-            ApiKey = "",
-            ApplicationName = ""
-        });
     }
 
     [SlashCommand("join", "Let the bot join a voice channel")]
@@ -132,38 +118,6 @@ public sealed class AudioCommands : InteractionModuleBase<SocketInteractionConte
             await FollowupAsync("I'm not connected to a voice channel.");
             return;
         }
-
-        /*
-        string spotifyLink = string.Empty;
-        Match m = Regex.Match(searchQuery, @"^(?:spotify:|https:\/\/[a-z]+\.spotify\.com\/(track\/|user\/(.*)\/playlist\/))(.*)$", RegexOptions.IgnoreCase);
-        if (m.Success)
-            spotifyLink = searchQuery;
-
-        if (spotifyLink != string.Empty)
-        {
-            string[] parts = spotifyLink.Split("/");
-            string idmeh = parts[4];
-            string[] parts2 = idmeh.Split("?");
-            string id = parts2[0];
-
-            var track = await _spotifyClient.Tracks.Get(id);
-
-            Console.WriteLine(track.Name + " " + track.Artists.First().Name);
-            var searchListRequest = _youtubeService.Search.List("snippet");
-            searchListRequest.Q = track.Name + " " + track.Artists.First().Name;
-            searchListRequest.MaxResults = 1;
-            searchListRequest.Type = "video";
-            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Relevance;
-
-            var searchListResponse = await searchListRequest.ExecuteAsync();
-            SearchResult firstResult = searchListResponse.Items.First();
-
-            searchQuery = "https://www.youtube.com/watch?v=" + firstResult.Id.VideoId;
-            
-            //await FollowupAsync("Got spotify link, aborting start...");
-            return;
-        }
-        */
 
         var searchResponse = await _lavaNode.SearchAsync(SearchType.Direct, searchQuery);
         if (searchResponse.Status is SearchStatus.LoadFailed or SearchStatus.NoMatches) {
