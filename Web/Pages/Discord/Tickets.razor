@@ -7,43 +7,80 @@
 @using Bot.Services
 @inject TicketService TicketService
 
-<h1>List of Tickets</h1>
+<div class="page-wrapper">
+    <!-- Page-header start -->
+    <div class="page-header card">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="page-header-title">
+                    <i class="icofont icofont icofont icofont-file-document bg-c-pink"></i>
+                    <div class="d-inline">
+                        <h4>List of Tickets</h4>
+                        <span>Here you can see a list of tickets that are in the database</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="page-header-breadcrumb">
+                    <ul class="breadcrumb-title">
+                        <li class="breadcrumb-item">
+                            <a href="/">
+                                <i class="icofont icofont-table"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#!">Discord</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#!">Tickets</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page-header end -->
 
-<p>Here you can find all the tickets that are in the database.</p>
-
-@if (tickets == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Ticket Id</th>
-                <th>Ticket Name</th>
-                <th>Is Open?</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ticket in tickets)
-            {
-                <tr>
-                    <td><a href="/discord/tickets/@ticket.Id">@ticket.channelId</a></td>
-                    <td>@ticket.channelName</td>
-                    @if (ticket.isClosed)
-                    {
-                        <td>❌</td>
-                    }
-                    else
-                    {
-                        <td>✔</td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    <div class="page-body">
+        <div class="card">
+            <div class="card-block table-border-style">
+                @if (tickets == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ticket Id</th>
+                                    <th>Ticket Name</th>
+                                    <th>Is Open?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ticket in tickets)
+                                {
+                                    <tr>
+                                        <td><a href="/discord/tickets/@ticket.Id">@ticket.channelId</a></td>
+                                        <td>@ticket.channelName</td>
+                                        @if (ticket.isClosed)
+                                        {
+                                            <td>❌</td>
+                                        }
+                                        else
+                                        {
+                                            <td>✔</td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private List<Ticket>? tickets;

@@ -55,8 +55,10 @@ builder.Services.AddAuthentication( x =>
     .AddCookie()
     .AddDiscord( x => 
     {
-        x.AppId = "";
-        x.AppSecret = "";
+        var discordSettings = builder.Configuration.GetSection("AuthenticationSettings");
+        
+        x.AppId = discordSettings.GetSection("Discord").GetValue<string>("ClientId");
+        x.AppSecret = discordSettings.GetSection("Discord").GetValue<string>("ClientSecret");
         x.Scope.Add("guilds");
 
         //Required for accessing the oauth2 token in order to make requests on the user's behalf, ie. accessing the user's guild list
@@ -107,7 +109,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

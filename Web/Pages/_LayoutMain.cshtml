@@ -3,30 +3,44 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
-<!--
-	Stellar by HTML5 UP
-	html5up.net | at ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <base href="~/" />
-    <!--
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    -->
-    <link rel="stylesheet" href="assets/css/main.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="description" content="FleckyBot Dashboard">
+    <meta name="author" content="Thomas Siladi">
+    <link rel="icon" href="assets-dashboard/images/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="assets-dashboard/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets-dashboard/icon/themify-icons/themify-icons.css">
+    <link rel="stylesheet" type="text/css" href="assets-dashboard/icon/icofont/css/icofont.css">
+    <link rel="stylesheet" type="text/css" href="assets-dashboard/css/style.css">
+    <link rel="stylesheet" type="text/css" href="assets-dashboard/css/jquery.mCustomScrollbar.css">
     <link href="css/site.css" rel="stylesheet" />
-	<noscript>
-		<link rel="stylesheet" href="assets/css/noscript.css" />
-	</noscript>
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
-<body class="is-preload">
+<body>
+    <!-- Pre-loader start -->
+    <div class="theme-loader">
+        <div class="ball-scale">
+            <div class='contain'>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+                <div class="ring"><div class="frame"></div></div>
+            </div>
+        </div>
+    </div>
+    <!-- Pre-loader end -->
+
     @RenderBody()
 
     <div id="blazor-error-ui">
@@ -40,17 +54,21 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <!--
-    <script src="https://kit.fontawesome.com/944eb371a4.js"></script>
-    <script src="js/anime.min.js"></script>
-    -->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/jquery.scrollex.min.js"></script>
-	<script src="assets/js/jquery.scrolly.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
-    <script src="_framework/blazor.server.js"></script>
+    <script type="text/javascript" src="assets-dashboard/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="assets-dashboard/js/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="assets-dashboard/js/popper.js/popper.min.js"></script>
+    <script type="text/javascript" src="assets-dashboard/js/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery slimscroll js -->
+    <script type="text/javascript" src="assets-dashboard/js/jquery-slimscroll/jquery.slimscroll.js"></script>
+    <!-- modernizr js -->
+    <script type="text/javascript" src="assets-dashboard/js/modernizr/modernizr.js"></script>
+    <script type="text/javascript" src="assets-dashboard/js/modernizr/css-scrollbars.js"></script>
+    <!-- classie js -->
+    <script type="text/javascript" src="assets-dashboard/js/classie/classie.js"></script>
+    <!-- Custom js -->
+    <script type="text/javascript" src="assets-dashboard/js/script.js"></script>
+    <script src="assets-dashboard/js/pcoded.min.js"></script>
+    <script src="assets-dashboard/js/demo-12.js"></script>
+    <script src="assets-dashboard/js/jquery.mCustomScrollbar.concat.min.js"></script>
 </body>
 </html>
