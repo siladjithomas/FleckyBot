@@ -7,53 +7,91 @@
 @using Bot.Services
 @inject TicketService TicketService
 
-@if (ticket == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <h1>Ticket View</h1>
-
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Ticket Id</th>
-                        <th>Ticket Name</th>
-                        <th>Is Open?</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>@ticket.channelId</th>
-                        <td>@ticket.channelName</td>
-                        @if (ticket.isClosed)
-                        {
-                            <td>❌</td>
-                        }
-                        else
-                        {
-                            <td>✔</td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="col">
-            @foreach (var message in ticket.messages)
-            {
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">@message.userName</h5>
-                        <p class="card-text">@message.message</p>
+<div class="page-wrapper">
+    @if (ticket == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="page-header card">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="page-header-title">
+                        <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
+                        <div class="d-inline">
+                            <h4>Ticket ID @ticket.Id</h4>
+                            <span>Here you can see a list of tickets that are in the database</span>
+                        </div>
                     </div>
                 </div>
-            }
+                <div class="col-lg-4">
+                    <div class="page-header-breadcrumb">
+                        <ul class="breadcrumb-title">
+                            <li class="breadcrumb-item">
+                                <a href="/">
+                                    <i class="icofont icofont-home"></i>
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">Discord
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/tickets">Tickets</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/tickets/@ticket.Id">@ticket.Id</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-}
+        <div class="page-body">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-block table-border-style">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticket Id</th>
+                                            <th>Ticket Name</th>
+                                            <th>Is Open?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>@ticket.channelId</th>
+                                            <td>@ticket.channelName</td>
+                                            @if (ticket.isClosed)
+                                            {
+                                                <td>❌</td>
+                                            }
+                                            else
+                                            {
+                                                <td>✔</td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    @foreach (var message in ticket.messages)
+                    {
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">@message.userName</h5>
+                                <p class="card-text">@message.message</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter]

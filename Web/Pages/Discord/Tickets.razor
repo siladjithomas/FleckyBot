@@ -13,7 +13,7 @@
         <div class="row align-items-end">
             <div class="col-lg-8">
                 <div class="page-header-title">
-                    <i class="icofont icofont icofont icofont-file-document bg-c-pink"></i>
+                    <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
                     <div class="d-inline">
                         <h4>List of Tickets</h4>
                         <span>Here you can see a list of tickets that are in the database</span>
@@ -25,7 +25,7 @@
                     <ul class="breadcrumb-title">
                         <li class="breadcrumb-item">
                             <a href="/">
-                                <i class="icofont icofont-table"></i>
+                                <i class="icofont icofont-home"></i>
                             </a>
                         </li>
                         <li class="breadcrumb-item"><a href="#!">Discord</a>
@@ -52,8 +52,8 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Ticket Id</th>
                                     <th>Ticket Name</th>
+                                    <th>Ticket Opener</th>
                                     <th>Is Open?</th>
                                 </tr>
                             </thead>
@@ -61,8 +61,8 @@
                                 @foreach (var ticket in tickets)
                                 {
                                     <tr>
-                                        <td><a href="/discord/tickets/@ticket.Id">@ticket.channelId</a></td>
-                                        <td>@ticket.channelName</td>
+                                        <td><a href="/discord/tickets/@ticket.Id">@ticket.channelName</a></td>
+                                        <td>@ticket.userName</td>
                                         @if (ticket.isClosed)
                                         {
                                             <td>❌</td>
