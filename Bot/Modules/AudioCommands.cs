@@ -9,11 +9,7 @@ using Serilog;
 using Victoria;
 using Victoria.Enums;
 using Victoria.Responses.Search;
-using SpotifyAPI.Web;
 using System.Text.RegularExpressions;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
 
 namespace Bot.Modules;
 

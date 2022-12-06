@@ -36,6 +36,7 @@ public class InteractionHandler
         _client.SelectMenuExecuted += SelectMenuExecuted;
         _client.ButtonExecuted += ButtonExecuted;
         _client.MessageReceived += MessageReceived;
+        _client.ModalSubmitted += ModalSubmitted;
 
         // TODO: When someone joins or gets moved to a specific channels
         //       check if the user wants to create a channel
@@ -250,6 +251,32 @@ public class InteractionHandler
         }
 
         await Task.CompletedTask;
+    }
+
+    public async Task ModalSubmitted(SocketModal modal)
+    {
+        if (modal.Data.CustomId == "complaint")
+        {
+            await modal.FollowupAsync();
+            
+            List<SocketMessageComponentData> values = modal.Data.Components.ToList();
+
+            SocketGuildUser? user = modal.User as SocketGuildUser;
+            SocketGuild? guild = user?.Guild;
+            
+            var embedComplaint = new EmbedBuilder()
+                .WithTitle("Sent complaint")
+                .WithDescription($"This is the complaint you sent to us:\n```{ values[2].Value }```");
+
+            var buttonComplaint = new ComponentBuilder()
+                .WithButton("Close Ticket", "close-ticket", ButtonStyle.Danger);
+
+            if (ulong.TryParse(values[1].Value, out ulong channelId))
+            {
+                SocketTextChannel ticketChannel = (SocketTextChannel)guild?.GetChannel(channelId);
+                await ticketChannel.SendMessageAsync(embed: embedComplaint.Build(), components: buttonComplaint.Build());
+            }
+        }
     }
 
     /*

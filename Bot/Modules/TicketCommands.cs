@@ -24,6 +24,55 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
         _guildService = service.GetRequiredService<GuildService>();
     }
 
+    [SlashCommand("complain", "Use this to send a complaint to the admins of this server.")]
+    public async Task CreateComplaint(string? channelName = null)
+    {
+        if (channelName == null)
+            channelName = $"complaint-{Context.User.Username}";
+        
+        Log.Debug($"[TicketCommands][CreateComplaint] Ticket Channel Name: {channelName}");
+
+        Guild guild = await _guildService.GetByGuildIdAsync(Context.Guild.Id);
+        var guildCategory = Context.Guild.GetCategoryChannel(guild.GuildTicketChannel.CategoryId);
+        var botsRole = Context.Guild.GetRole(943581066965426176);
+
+        var guildTicket = await Context.Guild.CreateTextChannelAsync(channelName, x => {
+            x.CategoryId = guildCategory.Id;
+            x.Topic = $"This complaint ticket has been created in behalf of {Context.User.Username}";
+        });
+
+        var complaintModal = new ModalBuilder()
+            .WithTitle("Complaint Form")
+            .WithCustomId("complaint")
+            .AddTextInput(new TextInputBuilder().WithCustomId("complaint-name").WithLabel("Name").WithRequired(true).WithStyle(TextInputStyle.Short).WithValue(Context.User.ToString()))
+            .AddTextInput(new TextInputBuilder().WithCustomId("complaint-ticket-id").WithLabel("Ticket ID").WithRequired(true).WithStyle(TextInputStyle.Short).WithValue(guildTicket.Id.ToString()))
+            .AddTextInput(new TextInputBuilder().WithCustomId("complaint-text").WithLabel("Complaint").WithRequired(true).WithStyle(TextInputStyle.Paragraph));
+        
+        await RespondWithModalAsync(complaintModal.Build());
+
+        Log.Debug($"[TicketCommands][CreateComplaint] Ticket type: Complaint");
+        Log.Debug($"[TicketCommands][CreateComplaint] Ticket channel id: {guildTicket.Id}");
+        Log.Debug($"[TicketCommands][CreateComplaint] Ticket channel name: {guildTicket.Name}");
+
+        await guildTicket.SyncPermissionsAsync();
+        await guildTicket.AddPermissionOverwriteAsync(Context.User, OverwritePermissions.DenyAll(guildTicket).Modify(
+            sendMessages: PermValue.Allow,
+            addReactions: PermValue.Allow, 
+            embedLinks: PermValue.Allow, 
+            readMessageHistory: PermValue.Allow, 
+            viewChannel: PermValue.Allow, 
+            attachFiles: PermValue.Allow
+        ));
+
+        await _ticketService.CreateAsync(new Ticket
+        {
+            userId = Context.User.Id,
+            userName = $"{Context.User.Username}#{Context.User.Discriminator}",
+            channelId = guildTicket.Id,
+            channelName = guildTicket.Name
+        });
+    }
+
     [SlashCommand("create", "Use this command to create a new ticket")]
     public async Task CreateTicket(string? channelName = null, bool isVoiceChannel = false)
     {
