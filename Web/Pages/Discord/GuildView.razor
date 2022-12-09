@@ -7,79 +7,110 @@
 @using Bot.Services
 @inject GuildService GuildService
 
-@if (guild == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <h1>Guild View</h1>
+<div class="page-wrapper">
+    @if (guild == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="page-header card">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="page-header-title">
+                        <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
+                        <div class="d-inline">
+                            <h4>Guild ID @Id</h4>
+                            <span>Guild Status Here</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="page-header-breadcrumb">
+                        <ul class="breadcrumb-title">
+                            <li class="breadcrumb-item">
+                                <a href="/">
+                                    <i class="icofont icofont-home"></i>
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">Discord
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/guilds">Guilds</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/guilds/@Id">@guild.GuildName</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th>Guild ID</th>
-                <th>@guild.GuildId</th>
-            </tr>
-            <tr>
-                <th>Guild Name</th>
-                <td>@guild.GuildName</td>
-            </tr>
-            <tr>
-                <th>Guild Admin ID</th>
-                <td>@guild.GuildAdminId</td>
-            </tr>
-            <tr>
-                <th>Guild Admin Name</th>
-                <td>@guild.GuildAdminName</td>
-            </tr>
-        </tbody>
-    </table>
-    <div class="accordion" id="accordionGuildItems">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    System Messages Channel
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionGuildItems">
-                <div class="accordion-body">
-                    @guild.GuildSystemMessagesChannel.ChannelName (#@guild.GuildSystemMessagesChannel.ChannelId)
+        <div class="page-body">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-block table-border-style">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>Guild ID</th>
+                                            <th>@guild.GuildId</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Guild Name</th>
+                                            <td>@guild.GuildName</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Guild Admin ID</th>
+                                            <td>@guild.GuildAdminId</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Guild Admin Name</th>
+                                            <td>@guild.GuildAdminName</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-block accordion-block">
+                            <div class="accordion-box" id="guild-settings">
+                                <a class="accordion-msg">System Messages Channel</a>
+                                <div class="accordion-desc">
+                                    <p>
+                                        @guild.GuildSystemMessagesChannel.ChannelName (#@guild.GuildSystemMessagesChannel.ChannelId)
+                                    </p>
+                                </div>
+                                <a class="accordion-msg">Votes Channel</a>
+                                <div class="accordion-desc">
+                                    <p>
+                                        @guild.GuildVotesChannel.ChannelName (#@guild.GuildVotesChannel.ChannelId)
+                                    </p>
+                                </div>
+                                <a class="accordion-msg">Tickets Channel</a>
+                                <div class="accordion-desc">
+                                    <p>
+                                        <b>Channel Category:</b> @guild.GuildTicketChannel.CategoryName (#@guild.GuildTicketChannel.CategoryId)<br />
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
-                    Votes Channel
-                </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionGuildItems">
-                <div class="accordion-body">
-                    @guild.GuildVotesChannel.ChannelName (#@guild.GuildVotesChannel.ChannelId)
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
-                    Tickets Channel
-                </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionGuildItems">
-                <div class="accordion-body">
-                    <b>Channel Category:</b> @guild.GuildTicketChannel.CategoryName (#@guild.GuildTicketChannel.CategoryId)<br />
-                </div>
-            </div>
-        </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     [Parameter]

@@ -7,37 +7,73 @@
 @using Bot.Services
 @inject ImageService ImageService
 
-<h1>Images in Database</h1>
+<div class="page-wrapper">
+    <!-- Page-header start -->
+    <div class="page-header card">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="page-header-title">
+                    <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
+                    <div class="d-inline">
+                        <h4>List of Images</h4>
+                        <span>Here you can see a list of images that are in the database</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="page-header-breadcrumb">
+                    <ul class="breadcrumb-title">
+                        <li class="breadcrumb-item">
+                            <a href="/">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#!">Discord</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#!">Images</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page-header end -->
 
-<p>Here is a list of pictures that are in the database.</p>
-
-@if (images == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Image Id</th>
-                <th>Image URL</th>
-                <th>Image Type</th>
-                <th>Preview</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var image in images)
-            {
-                <tr>
-                    <th><a href="/discord/images/@image.Id">@image.Id</a></th>
-                    <td>@image.url</td>
-                    <td>@image.type</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    <div class="page-body">
+        <div class="card">
+            <div class="card-block table-border-style">
+                @if (images == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Image Id</th>
+                                    <th>Image URL</th>
+                                    <th>Image Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var image in images)
+                                {
+                                    <tr>
+                                        <th><a href="/discord/images/@image.Id">@image.Id</a></th>
+                                        <td>@image.url</td>
+                                        <td>@image.type</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private List<Image>? images;

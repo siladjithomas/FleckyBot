@@ -7,16 +7,83 @@
 @using Bot.Services
 @inject ImageService ImageService
 
-@if(image == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <h2>@Id</h2>
-    <h3>Type: @image.type</h3>
-    <p><img src="@image.url" alt="@image.type" /></p>
-}
+<div class="page-wrapper">
+    @if(image == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="page-header card">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="page-header-title">
+                        <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
+                        <div class="d-inline">
+                            <h4>List of Images</h4>
+                            <span>Here you can see a list of images that are in the database</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="page-header-breadcrumb">
+                        <ul class="breadcrumb-title">
+                            <li class="breadcrumb-item">
+                                <a href="/">
+                                    <i class="icofont icofont-home"></i>
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="#!">Discord</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/images">Images</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/discord/images/@Id">Images</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-body">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-block table-border-style">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Index</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>ID</th>
+                                            <td>@Id</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Type</th>
+                                            <td>@image.type</td>
+                                        </tr>
+                                        <tr>
+                                            <th>URL</th>
+                                            <td>@image.url</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="@image.url" alt="@Id" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter]

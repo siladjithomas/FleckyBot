@@ -10,36 +10,73 @@
 @inject GuildService GuildService
 @inject Web.Services.UserService usrSvc
 
-<h1>List of Guilds</h1>
+<div class="page-wrapper">
+    <!-- Page-header start -->
+    <div class="page-header card">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="page-header-title">
+                    <i class="icofont icofont icofont icofont-table bg-c-pink"></i>
+                    <div class="d-inline">
+                        <h4>List of Guild</h4>
+                        <span>Here you can see a list of guilds you have access to and use FleckyBot</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="page-header-breadcrumb">
+                    <ul class="breadcrumb-title">
+                        <li class="breadcrumb-item">
+                            <a href="/">
+                                <i class="icofont icofont-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#!">Discord</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/discord/guilds">Guilds</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page-header end -->
 
-<p>Here you can find all the guilds where the bot is present</p>
-
-@if (guilds == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Guild Id</th>
-                <th>Guild Name</th>
-                <th>Guild Admin Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var guild in guilds)
-            {
-                <tr>
-                    <th><a href="/discord/guilds/@guild.Id">@guild.GuildId</a></th>
-                    <td>@guild.GuildName</td>
-                    <td>@guild.GuildAdminName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (guilds == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="page-body">
+            <div class="card">
+                <div class="card-block table-border-style">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Guild Id</th>
+                                    <th>Guild Name</th>
+                                    <th>Guild Admin Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var guild in guilds)
+                                {
+                                    <tr>
+                                        <th><a href="/discord/guilds/@guild.Id">@guild.GuildId</a></th>
+                                        <td>@guild.GuildName</td>
+                                        <td>@guild.GuildAdminName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
     private List<Guild>? guilds;
