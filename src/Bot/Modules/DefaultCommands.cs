@@ -38,4 +38,30 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
         
         await FollowupAsync(embed: embed.Build());
     }
+
+    [SlashCommand("8ball", "Ask a question and get an answer!")]
+    public async Task EightBall(string question)
+    {
+        await DeferAsync();
+        
+        var replies = new List<string>
+        {
+            "yes",
+            "no",
+        	"maybe",
+            "hazzzzzy...."
+        };
+
+        var answer = replies[new Random().Next(replies.Count - 1)];
+
+        var embed = new EmbedBuilder()
+            .WithTitle("8ball")
+            .WithDescription($"You asked: [**{question}**], and your answer is: [**{answer}**]")
+            .WithFooter(new EmbedFooterBuilder().WithText($"Command executed by {Context.User}.").WithIconUrl(Context.User.GetAvatarUrl()))
+            .WithThumbnailUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/8_ball_icon.svg/1200px-8_ball_icon.svg.png")
+            .WithColor(Color.DarkBlue)
+            .WithCurrentTimestamp();
+        
+        await FollowupAsync(embed: embed.Build());
+    }
 }
