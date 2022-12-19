@@ -1,9 +1,10 @@
 using System.Globalization;
 using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using FleckyBot.Bot.Models;
+using Bot.Models;
+using Bot.Services;
 
 namespace Bot;
 
@@ -12,15 +13,16 @@ public class Worker : BackgroundService
     private readonly IServiceProvider _provider;
     private readonly ILogger<Worker> _logger;
     private readonly DiscordSocketClient _client;
-    private readonly CommandService _commands;
+    private readonly InteractionService _commands;
     private readonly BotSettings _settings;
+    private readonly CommandHandler _handler;
 
     private IServiceScope? _scope;
 
     public Worker(ILogger<Worker> logger, 
         IServiceProvider? provider, 
         DiscordSocketClient? client,
-        CommandService? commands,
+        InteractionService? commands,
         BotSettings? settings)
     {
         _logger = logger;
@@ -28,6 +30,8 @@ public class Worker : BackgroundService
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+
+        _handler = new CommandHandler(_client, _commands, _provider, _settings, _logger);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,6 +45,8 @@ public class Worker : BackgroundService
         try
         {
             _scope = _provider.CreateScope();
+
+            _handler.Initialize(_scope);
 
             await _commands.AddModulesAsync(typeof(Worker).Assembly, _scope.ServiceProvider);
 
@@ -77,7 +83,7 @@ public class Worker : BackgroundService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _client.LoginAsync(TokenType.Bot, "");
+            await _client.LoginAsync(TokenType.Bot, _settings.BotToken);
             await _client.StartAsync();
         }
         catch (Exception ex)

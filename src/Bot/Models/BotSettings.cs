@@ -1,4 +1,4 @@
-namespace FleckyBot.Bot.Models;
+namespace Bot.Models;
 
 public class BotSettings
 {
