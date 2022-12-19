@@ -459,3 +459,6 @@ $RECYCLE.BIN/
 
 # Ignore Log files
 log_*.txt
+
+# Ignore SQLite database files
+*.db
