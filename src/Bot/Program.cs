@@ -1,9 +1,12 @@
 using Bot;
 using Bot.Models;
 using Bot.Services;
+using Database.DatabaseContexts;
+using Database.Services;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -38,6 +41,21 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<CommandHandler>();
         
         services.AddHostedService<Worker>();
+
+        services.AddDbContext<ApplicationContext>(options => 
+        {
+            options.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+        });
+
+        {
+            var builder = new DbContextOptionsBuilder<ApplicationContext>();
+            builder.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+
+            using var context = new ApplicationContext(builder.Options);
+            context.Database.Migrate();
+        }
+
+        services.AddScoped<RequestableRoleManager>();
     })
     .Build();
 
