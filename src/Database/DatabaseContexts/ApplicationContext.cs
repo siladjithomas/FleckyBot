@@ -1,5 +1,6 @@
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Database.DatabaseContexts;
 
@@ -17,6 +18,7 @@ public class ApplicationContext : DbContext
     public DbSet<GuildVotesChannel> GuildVotesChannels { get; set; }
     public DbSet<GuildTicketsChannel> GuildTicketsChannels { get; set; }
     public DbSet<GuildTicketsGroup> GuildTicketsGroups { get; set; }
+    public DbSet<Quote> Quote { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +49,28 @@ public class ApplicationContext : DbContext
 
             entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.ChannelId);
         });
+
+        string text = File.ReadAllText(@"./quotesCollection.json");
+        List<QuoteJson>? quotes = JsonSerializer.Deserialize<List<QuoteJson>>(text);
+        var quotesInList = new List<Quote>();
+        ulong id = 1;
+
+        if (quotes != null)
+            foreach (QuoteJson quote in quotes)
+            {
+                var combinedQuotes = String.Join(@"\n", quote.quote);
+                
+                quotesInList.Add(new Quote
+                {
+                    Id = id,
+                    QuoteText = combinedQuotes,
+                    QuoteAuthor = quote.author
+                });
+
+                id++;
+            }
+
+        modelBuilder.Entity<Quote>().HasData(quotesInList);
         
         base.OnModelCreating(modelBuilder);
     }
