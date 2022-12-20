@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20221220192849_AddSeedQuotes")]
-    partial class AddSeedQuotes
+    [Migration("20221220201457_DBInit")]
+    partial class DBInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,7 +21,8 @@ namespace Bot.Migrations
 
             modelBuilder.Entity("Database.Models.Guild", b =>
                 {
-                    b.Property<ulong>("GuildId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("GuildAdminId")
@@ -31,11 +32,17 @@ namespace Bot.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("GuildName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("GuildId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId")
+                        .IsUnique();
 
                     b.ToTable("Guilds");
                 });

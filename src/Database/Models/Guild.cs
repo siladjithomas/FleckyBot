@@ -5,6 +5,7 @@ namespace Database.Models;
 public class Guild
 {
     [Key]
+    public int Id { get; set; }
     public ulong GuildId { get; set; }
     public string GuildName { get; set; }
     public ulong GuildAdminId { get; set; }

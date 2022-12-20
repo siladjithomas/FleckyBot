@@ -83,9 +83,11 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
         if (guild == null)
         {
             SocketTextChannel? channel = Context.Channel as SocketTextChannel;
+            int count = _context.Guilds.Count() + 1;
 
             _context.Guilds.Add(new Guild
             {
+                Id = count,
                 GuildId = Context.Guild.Id,
                 GuildName = Context.Guild.Name,
                 GuildAdminId = Context.Guild.OwnerId,
