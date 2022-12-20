@@ -76,6 +76,8 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     {
         await DeferAsync(ephemeral: true);
 
+        _logger.LogInformation($"/setup slash command run by {Context.User}.");
+
         Guild? guild = _context.Guilds.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
 
         if (guild == null)
@@ -171,7 +173,5 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             await FollowupAsync("Guild has been already set up. Skipping...");
             return;
         }
-
-        await FollowupAsync("hehe");
     }
 }
