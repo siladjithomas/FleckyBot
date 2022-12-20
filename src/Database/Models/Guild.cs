@@ -20,7 +20,6 @@ public class GuildSystemMessagesChannel
 {
     [Key]
     public ulong ChannelId { get; set; }
-    [Required]
     public string ChannelName { get; set; }
 
     public ulong GuildId { get; set; }
@@ -31,7 +30,6 @@ public class GuildRolesChannel
 {
     [Key]
     public ulong ChannelId { get; set; }
-    [Required]
     public string ChannelName { get; set; }
 
     public ulong GuildId { get; set; }
@@ -42,7 +40,6 @@ public class GuildVotesChannel
 {
     [Key]
     public ulong ChannelId { get; set; }
-    [Required]
     public string ChannelName { get; set; }
 
     public ulong GuildId { get; set; }
@@ -53,7 +50,6 @@ public class GuildTicketsChannel
 {
     [Key]
     public ulong ChannelId { get; set; }
-    [Required]
     public string ChannelName { get; set; }
     
     public List<GuildTicketsGroup> GuildTicketsGroups { get; set; }
@@ -65,9 +61,7 @@ public class GuildTicketsGroup
 {
     [Key]
     public ulong GroupId { get; set; }
-    [Required]
     public string GroupName { get; set; }
-    [Required]
     public string GroupType { get; set; }
 
     public GuildTicketsChannel GuildTicketsChannel { get; set; }

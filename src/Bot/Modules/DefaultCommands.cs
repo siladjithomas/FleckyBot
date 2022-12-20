@@ -3,6 +3,8 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Bot;
 using Bot.Services;
+using Database.DatabaseContexts;
+using Database.Models;
 
 namespace Bot.Modules;
 
@@ -11,12 +13,14 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     public InteractionService commands { get; set; }
     private readonly CommandHandler _handler;
     private readonly ILogger<Worker> _logger;
+    private readonly ApplicationContext _context;
 
-    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger)
+    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, ApplicationContext context)
     {
         commands = service;
         _handler = handler;
         _logger = logger;
+        _context = context;
     }
 
     [SlashCommand("random", "Get a random number!")]
@@ -61,7 +65,113 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             .WithThumbnailUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/8_ball_icon.svg/1200px-8_ball_icon.svg.png")
             .WithColor(Color.DarkBlue)
             .WithCurrentTimestamp();
+
+        _logger.LogInformation($"/8ball slash command run by {Context.User}.");
         
         await FollowupAsync(embed: embed.Build());
+    }
+
+    [SlashCommand("setup", "Setup the guild in the database")]
+    public async Task SetupGuild()
+    {
+        await DeferAsync(ephemeral: true);
+
+        Guild? guild = _context.Guilds.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
+
+        if (guild == null)
+        {
+            SocketTextChannel? channel = Context.Channel as SocketTextChannel;
+
+            _context.Guilds.Add(new Guild
+            {
+                GuildId = Context.Guild.Id,
+                GuildName = Context.Guild.Name,
+                GuildAdminId = Context.Guild.OwnerId,
+                GuildAdminName = $"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}",
+                GuildRolesChannel = new GuildRolesChannel
+                {
+                    ChannelId = 0,
+                    ChannelName = "#INVALID#"
+                },
+                GuildSystemMessagesChannel = new GuildSystemMessagesChannel
+                {
+                    ChannelId = 0,
+                    ChannelName = "#INVALID#"
+                },
+                GuildVotesChannel = new GuildVotesChannel
+                {
+                    ChannelId = 0,
+                    ChannelName = "#INVALID#"
+                },
+                GuildTicketsChannel = new GuildTicketsChannel
+                {
+                    ChannelId = 0,
+                    ChannelName = "#INVALID#",
+                    GuildTicketsGroups = new List<GuildTicketsGroup>
+                    {
+                        new GuildTicketsGroup
+                        {
+                            GroupId = 0,
+                            GroupName = "#INVALID#",
+                            GroupType = "mod"
+                        }
+                    }
+                }
+            });
+
+            await _context.SaveChangesAsync();
+
+            SelectMenuBuilder systemMessagesChannel = new SelectMenuBuilder()
+                .WithCustomId("menu-setup-systemmessages")
+                .WithPlaceholder("Select a channel for system messages");
+            SelectMenuBuilder votesChannel = new SelectMenuBuilder()
+                .WithCustomId("menu-setup-votes")
+                .WithPlaceholder("Select a channel for votes");
+            
+            SelectMenuBuilder ticketCategoryChannel = new SelectMenuBuilder()
+                .WithCustomId("menu-setup-tickets-category")
+                .WithPlaceholder("Select a category for tickets");
+            SelectMenuBuilder ticketAdminRoleChannel = new SelectMenuBuilder()
+                .WithCustomId("menu-setup-tickets-role-admin")
+                .WithPlaceholder("Select a role for admin");
+            SelectMenuBuilder ticketModeratorRoleChannel = new SelectMenuBuilder()
+                .WithCustomId("menu-setup-tickets-role-moderator")
+                .WithPlaceholder("Select a role for moderators");
+            
+            foreach (SocketTextChannel textChannel in Context.Guild.TextChannels)
+            {
+                systemMessagesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
+                votesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
+            }
+
+            foreach (SocketCategoryChannel categoryChannel in Context.Guild.CategoryChannels)
+                ticketCategoryChannel.AddOption(categoryChannel.Name, $"{categoryChannel.Id}");
+            
+            foreach (SocketRole roles in Context.Guild.Roles)
+            {
+                ticketAdminRoleChannel.AddOption(roles.Name, $"{roles.Id}");
+                ticketModeratorRoleChannel.AddOption(roles.Name, $"{roles.Id}");
+            }
+
+            if (channel != null)
+            {
+                await FollowupAsync("Guild has been set up. Please choose the channels/groups/roles that you would like to use:");
+                
+                await channel.SendMessageAsync("System Messages Channel:", components: new ComponentBuilder().WithSelectMenu(systemMessagesChannel).Build());
+                await channel.SendMessageAsync("Votes Channel:", components: new ComponentBuilder().WithSelectMenu(votesChannel).Build());
+                await channel.SendMessageAsync("Ticket Options:", components: new ComponentBuilder().WithSelectMenu(ticketCategoryChannel).WithSelectMenu(ticketAdminRoleChannel).WithSelectMenu(ticketModeratorRoleChannel).Build());
+            }
+            else
+            {
+                await FollowupAsync("Something happened here. I do not know what but yeah...");
+            }
+        }
+        else
+        {
+            await FollowupAsync("Guild has been already set up. Skipping...");
+            return;
+        }
+
+        await FollowupAsync("hehe");
     }
 }
