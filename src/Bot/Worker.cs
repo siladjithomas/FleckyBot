@@ -16,6 +16,7 @@ public class Worker : BackgroundService
     private readonly InteractionService _commands;
     private readonly BotSettings _settings;
     private readonly CommandHandler _handler;
+    private readonly InteractionHandler _interaction;
 
     private IServiceScope? _scope;
 
@@ -23,13 +24,15 @@ public class Worker : BackgroundService
         IServiceProvider? provider, 
         DiscordSocketClient? client,
         InteractionService? commands,
-        BotSettings? settings)
+        BotSettings? settings,
+        InteractionHandler? interaction)
     {
         _logger = logger;
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _interaction = interaction ?? throw new ArgumentNullException(nameof(interaction));
 
         _handler = new CommandHandler(_client, _commands, _provider, _settings, _logger);
     }

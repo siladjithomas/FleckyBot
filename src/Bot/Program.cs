@@ -39,6 +39,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
+        services.AddSingleton<InteractionHandler>();
         
         services.AddHostedService<Worker>();
 
