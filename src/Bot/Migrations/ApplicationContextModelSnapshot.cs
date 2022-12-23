@@ -18,8 +18,7 @@ namespace Bot.Migrations
 
             modelBuilder.Entity("Database.Models.Guild", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<ulong>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("GuildAdminId")
@@ -29,17 +28,11 @@ namespace Bot.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<ulong>("GuildId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("GuildName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("GuildId")
-                        .IsUnique();
+                    b.HasKey("GuildId");
 
                     b.ToTable("Guilds");
                 });

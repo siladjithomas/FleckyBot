@@ -13,21 +13,21 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     public InteractionService commands { get; set; }
     private readonly CommandHandler _handler;
     private readonly ILogger<Worker> _logger;
-    private readonly ApplicationContext _context;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, ApplicationContext context)
+    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
     {
         commands = service;
         _handler = handler;
         _logger = logger;
-        _context = context;
+        _scopeFactory = scopeFactory;
     }
 
     [SlashCommand("random", "Get a random number!")]
     public async Task RandomNumber(int min = 1, int max = 100)
     {
         await DeferAsync();
-        
+
         var random = new Random();
 
         var embed = new EmbedBuilder()
@@ -37,9 +37,9 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             .WithThumbnailUrl("https://image.similarpng.com/very-thumbnail/2021/05/Rolling-dice-isolated-on-transparent-background-PNG.png")
             .WithFooter(new EmbedFooterBuilder().WithText($"Executed by: {Context.User}").WithIconUrl(Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl()))
             .WithCurrentTimestamp();
-        
+
         _logger.LogInformation($"/random slash command run by {Context.User}.");
-        
+
         await FollowupAsync(embed: embed.Build());
     }
 
@@ -47,12 +47,12 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     public async Task EightBall(string question)
     {
         await DeferAsync();
-        
+
         var replies = new List<string>
         {
             "yes",
             "no",
-        	"maybe",
+            "maybe",
             "hazzzzzy...."
         };
 
@@ -67,7 +67,7 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             .WithCurrentTimestamp();
 
         _logger.LogInformation($"/8ball slash command run by {Context.User}.");
-        
+
         await FollowupAsync(embed: embed.Build());
     }
 
@@ -78,40 +78,43 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
 
         _logger.LogInformation($"/setup slash command run by {Context.User}.");
 
-        Guild? guild = _context.Guilds.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
-
-        if (guild == null)
+        using (var scope = _scopeFactory.CreateScope())
         {
-            SocketTextChannel? channel = Context.Channel as SocketTextChannel;
-            int count = _context.Guilds.Count() + 1;
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            _context.Guilds.Add(new Guild
-            {
-                Id = count,
-                GuildId = Context.Guild.Id,
-                GuildName = Context.Guild.Name,
-                GuildAdminId = Context.Guild.OwnerId,
-                GuildAdminName = $"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}",
-                GuildRolesChannel = new GuildRolesChannel
+            Guild? guild = context.Guilds.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
+
+            if (guild == null)
+            {   
+                SocketTextChannel? channel = Context.Channel as SocketTextChannel;
+                int count = context.Guilds.Count() + 1;
+
+                context.Guilds.Add(new Guild
                 {
-                    ChannelId = 0,
-                    ChannelName = "#INVALID#"
-                },
-                GuildSystemMessagesChannel = new GuildSystemMessagesChannel
-                {
-                    ChannelId = 0,
-                    ChannelName = "#INVALID#"
-                },
-                GuildVotesChannel = new GuildVotesChannel
-                {
-                    ChannelId = 0,
-                    ChannelName = "#INVALID#"
-                },
-                GuildTicketsChannel = new GuildTicketsChannel
-                {
-                    ChannelId = 0,
-                    ChannelName = "#INVALID#",
-                    GuildTicketsGroups = new List<GuildTicketsGroup>
+                    GuildId = Context.Guild.Id,
+                    GuildName = Context.Guild.Name,
+                    GuildAdminId = Context.Guild.OwnerId,
+                    GuildAdminName = $"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}",
+                    GuildRolesChannel = new GuildRolesChannel
+                    {
+                        ChannelId = 0,
+                        ChannelName = "#INVALID#"
+                    },
+                    GuildSystemMessagesChannel = new GuildSystemMessagesChannel
+                    {
+                        ChannelId = 0,
+                        ChannelName = "#INVALID#"
+                    },
+                    GuildVotesChannel = new GuildVotesChannel
+                    {
+                        ChannelId = 0,
+                        ChannelName = "#INVALID#"
+                    },
+                    GuildTicketsChannel = new GuildTicketsChannel
+                    {
+                        ChannelId = 0,
+                        ChannelName = "#INVALID#",
+                        GuildTicketsGroups = new List<GuildTicketsGroup>
                     {
                         new GuildTicketsGroup
                         {
@@ -120,60 +123,61 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
                             GroupType = "mod"
                         }
                     }
+                    }
+                });
+
+                await context.SaveChangesAsync();
+
+                SelectMenuBuilder systemMessagesChannel = new SelectMenuBuilder()
+                    .WithCustomId("menu-setup-systemmessages")
+                    .WithPlaceholder("Select a channel for system messages");
+                SelectMenuBuilder votesChannel = new SelectMenuBuilder()
+                    .WithCustomId("menu-setup-votes")
+                    .WithPlaceholder("Select a channel for votes");
+
+                SelectMenuBuilder ticketCategoryChannel = new SelectMenuBuilder()
+                    .WithCustomId("menu-setup-tickets-category")
+                    .WithPlaceholder("Select a category for tickets");
+                SelectMenuBuilder ticketAdminRoleChannel = new SelectMenuBuilder()
+                    .WithCustomId("menu-setup-tickets-role-admin")
+                    .WithPlaceholder("Select a role for admin");
+                SelectMenuBuilder ticketModeratorRoleChannel = new SelectMenuBuilder()
+                    .WithCustomId("menu-setup-tickets-role-moderator")
+                    .WithPlaceholder("Select a role for moderators");
+
+                foreach (SocketTextChannel textChannel in Context.Guild.TextChannels)
+                {
+                    systemMessagesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
+                    votesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
                 }
-            });
 
-            await _context.SaveChangesAsync();
+                foreach (SocketCategoryChannel categoryChannel in Context.Guild.CategoryChannels)
+                    ticketCategoryChannel.AddOption(categoryChannel.Name, $"{categoryChannel.Id}");
 
-            SelectMenuBuilder systemMessagesChannel = new SelectMenuBuilder()
-                .WithCustomId("menu-setup-systemmessages")
-                .WithPlaceholder("Select a channel for system messages");
-            SelectMenuBuilder votesChannel = new SelectMenuBuilder()
-                .WithCustomId("menu-setup-votes")
-                .WithPlaceholder("Select a channel for votes");
-            
-            SelectMenuBuilder ticketCategoryChannel = new SelectMenuBuilder()
-                .WithCustomId("menu-setup-tickets-category")
-                .WithPlaceholder("Select a category for tickets");
-            SelectMenuBuilder ticketAdminRoleChannel = new SelectMenuBuilder()
-                .WithCustomId("menu-setup-tickets-role-admin")
-                .WithPlaceholder("Select a role for admin");
-            SelectMenuBuilder ticketModeratorRoleChannel = new SelectMenuBuilder()
-                .WithCustomId("menu-setup-tickets-role-moderator")
-                .WithPlaceholder("Select a role for moderators");
-            
-            foreach (SocketTextChannel textChannel in Context.Guild.TextChannels)
-            {
-                systemMessagesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
-                votesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
-            }
+                foreach (SocketRole roles in Context.Guild.Roles)
+                {
+                    ticketAdminRoleChannel.AddOption(roles.Name, $"{roles.Id}");
+                    ticketModeratorRoleChannel.AddOption(roles.Name, $"{roles.Id}");
+                }
 
-            foreach (SocketCategoryChannel categoryChannel in Context.Guild.CategoryChannels)
-                ticketCategoryChannel.AddOption(categoryChannel.Name, $"{categoryChannel.Id}");
-            
-            foreach (SocketRole roles in Context.Guild.Roles)
-            {
-                ticketAdminRoleChannel.AddOption(roles.Name, $"{roles.Id}");
-                ticketModeratorRoleChannel.AddOption(roles.Name, $"{roles.Id}");
-            }
+                if (channel != null)
+                {
+                    await FollowupAsync("Guild has been set up. Please choose the channels/groups/roles that you would like to use:");
 
-            if (channel != null)
-            {
-                await FollowupAsync("Guild has been set up. Please choose the channels/groups/roles that you would like to use:");
-                
-                await channel.SendMessageAsync("System Messages Channel:", components: new ComponentBuilder().WithSelectMenu(systemMessagesChannel).Build());
-                await channel.SendMessageAsync("Votes Channel:", components: new ComponentBuilder().WithSelectMenu(votesChannel).Build());
-                await channel.SendMessageAsync("Ticket Options:", components: new ComponentBuilder().WithSelectMenu(ticketCategoryChannel).WithSelectMenu(ticketAdminRoleChannel).WithSelectMenu(ticketModeratorRoleChannel).Build());
+                    await channel.SendMessageAsync("System Messages Channel:", components: new ComponentBuilder().WithSelectMenu(systemMessagesChannel).Build());
+                    await channel.SendMessageAsync("Votes Channel:", components: new ComponentBuilder().WithSelectMenu(votesChannel).Build());
+                    await channel.SendMessageAsync("Ticket Options:", components: new ComponentBuilder().WithSelectMenu(ticketCategoryChannel).WithSelectMenu(ticketAdminRoleChannel).WithSelectMenu(ticketModeratorRoleChannel).Build());
+                }
+                else
+                {
+                    await FollowupAsync("Something happened here. I do not know what but yeah...");
+                }
             }
             else
             {
-                await FollowupAsync("Something happened here. I do not know what but yeah...");
+                await FollowupAsync("Guild has been already set up. Skipping...");
+                return;
             }
-        }
-        else
-        {
-            await FollowupAsync("Guild has been already set up. Skipping...");
-            return;
         }
     }
 }

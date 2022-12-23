@@ -40,12 +40,13 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<InteractionHandler>();
-        
-        services.AddHostedService<Worker>();
 
         services.AddDbContext<ApplicationContext>(options => 
         {
-            options.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+            if (hostContext.Configuration.GetSection("ConnectionStrings").GetValue<string>("IsSqlite") == "True")
+                options.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+            else
+                options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
         });
 
         {
@@ -55,6 +56,8 @@ IHost host = Host.CreateDefaultBuilder(args)
             using var context = new ApplicationContext(builder.Options);
             context.Database.Migrate();
         }
+
+        services.AddHostedService<Worker>();
 
         services.AddScoped<RequestableRoleManager>();
     })
