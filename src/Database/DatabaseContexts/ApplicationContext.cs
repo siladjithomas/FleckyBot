@@ -19,6 +19,8 @@ public class ApplicationContext : DbContext
     public DbSet<GuildTicketsChannel> GuildTicketsChannels { get; set; }
     public DbSet<GuildTicketsGroup> GuildTicketsGroups { get; set; }
     public DbSet<Quote> Quote { get; set; }
+    public DbSet<Vote> Vote { get; set; }
+    public DbSet<VoteUser> VoteUser { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +50,10 @@ public class ApplicationContext : DbContext
             entity.HasKey(ut => new { ut.ChannelId });
 
             entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.ChannelId);
+        });
+
+        modelBuilder.Entity<VoteUser>(entity => {
+            entity.HasOne(ut => ut.Vote).WithMany(t => t.VoteByUser).HasForeignKey(t => t.Id);
         });
 
         string text = File.ReadAllText(@"./quotesCollection.json");

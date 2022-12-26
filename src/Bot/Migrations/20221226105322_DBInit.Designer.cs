@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20221222231626_DBInit")]
+    [Migration("20221226105322_DBInit")]
     partial class DBInit
     {
         /// <inheritdoc />
