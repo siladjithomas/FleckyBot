@@ -106,6 +106,41 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
         _logger.LogInformation($"/votes setup slash command run by {Context.User}.");
 
-        await FollowupAsync("Choosen channel for votes.");
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).FirstOrDefault();
+
+            if (guild != null)
+            {
+                GuildVotesChannel? votesChannel = guild.GuildVotesChannel;
+
+                if (votesChannel == null)
+                {
+                    guild.GuildVotesChannel = new GuildVotesChannel
+                    {
+                        ChannelId = channel.Id,
+                        ChannelName = channel.Name
+                    };
+
+                    context.Update(guild);
+
+                    await context.SaveChangesAsync();
+
+                    await FollowupAsync($"Channel {channel.Mention} has been set as Votes channel for guild {Context.Guild.Name}.");
+                    _logger.LogInformation($"Channel {channel} has been set as Votes channel for guild {Context.Guild.Name}.");
+                }
+                else
+                {
+                    await FollowupAsync("I give up. Votes channel not set up.");
+                }
+            }
+            else
+            {
+                await FollowupAsync("Guild has not been set up. Please use the /setup slash command to set up this guild in the database.");
+                _logger.LogWarning($"Guild {Context.Guild.Name} has not been found in the database. Informed user to use ");
+            }
+        }
     }
 }

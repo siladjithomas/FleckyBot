@@ -113,16 +113,7 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
                     GuildTicketsChannel = new GuildTicketsChannel
                     {
                         ChannelId = 0,
-                        ChannelName = "#INVALID#",
-                        GuildTicketsGroups = new List<GuildTicketsGroup>
-                    {
-                        new GuildTicketsGroup
-                        {
-                            GroupId = 0,
-                            GroupName = "#INVALID#",
-                            GroupType = "mod"
-                        }
-                    }
+                        ChannelName = "#INVALID#"
                     }
                 });
 
