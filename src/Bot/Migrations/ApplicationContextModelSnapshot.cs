@@ -19,114 +19,124 @@ namespace Bot.Migrations
 
             modelBuilder.Entity("Database.Models.Guild", b =>
                 {
-                    b.Property<ulong>("GuildId")
+                    b.Property<int>("Id")
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("GuildAdminId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("GuildAdminName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("GuildName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("GuildId");
+                    b.HasKey("Id");
 
                     b.ToTable("Guilds");
                 });
 
             modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
                 {
-                    b.Property<ulong>("ChannelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("GuildId")
+                    b.Property<ulong>("ChannelId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ChannelId");
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("GuildRolesChannels");
                 });
 
             modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
                 {
-                    b.Property<ulong>("ChannelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("GuildId")
+                    b.Property<ulong>("ChannelId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ChannelId");
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("GuildSystemMessagesChannels");
                 });
 
             modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
                 {
-                    b.Property<ulong>("ChannelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("GuildId")
+                    b.Property<ulong>("ChannelId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ChannelId");
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("GuildTicketsChannels");
                 });
 
             modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
                 {
-                    b.Property<ulong>("ChannelId")
+                    b.Property<int>("Id")
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("GroupId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("GroupName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("GroupType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ChannelId");
+                    b.Property<int>("GuildTicketChannelId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("GuildTicketsGroups");
                 });
 
             modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
                 {
-                    b.Property<ulong>("ChannelId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<ulong>("GuildId")
+                    b.Property<ulong>("ChannelId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ChannelId");
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("GuildVotesChannels");
                 });
@@ -9364,25 +9374,25 @@ namespace Bot.Migrations
                 {
                     b.HasOne("Database.Models.GuildRolesChannel", "GuildRolesChannel")
                         .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "GuildId")
+                        .HasForeignKey("Database.Models.Guild", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Database.Models.GuildSystemMessagesChannel", "GuildSystemMessagesChannel")
                         .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "GuildId")
+                        .HasForeignKey("Database.Models.Guild", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
                         .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "GuildId")
+                        .HasForeignKey("Database.Models.Guild", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Database.Models.GuildVotesChannel", "GuildVotesChannel")
                         .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "GuildId")
+                        .HasForeignKey("Database.Models.Guild", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -9399,7 +9409,7 @@ namespace Bot.Migrations
                 {
                     b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
                         .WithMany("GuildTicketsGroups")
-                        .HasForeignKey("ChannelId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -9419,28 +9429,24 @@ namespace Bot.Migrations
 
             modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
                 {
-                    b.Navigation("Guild")
-                        .IsRequired();
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
                 {
-                    b.Navigation("Guild")
-                        .IsRequired();
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
                 {
-                    b.Navigation("Guild")
-                        .IsRequired();
+                    b.Navigation("Guild");
 
                     b.Navigation("GuildTicketsGroups");
                 });
 
             modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
                 {
-                    b.Navigation("Guild")
-                        .IsRequired();
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.Vote", b =>

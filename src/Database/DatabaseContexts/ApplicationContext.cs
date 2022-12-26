@@ -28,28 +28,26 @@ public class ApplicationContext : DbContext
 
         modelBuilder.Entity<GuildSystemMessagesChannel>(entity => 
         {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildSystemMessagesChannel).HasForeignKey<Guild>(t => t.GuildId);
+            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildSystemMessagesChannel).HasForeignKey<Guild>(t => t.Id);
         });
 
         modelBuilder.Entity<GuildRolesChannel>(entity => 
         {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildRolesChannel).HasForeignKey<Guild>(t => t.GuildId);
+            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildRolesChannel).HasForeignKey<Guild>(t => t.Id);
         });
 
         modelBuilder.Entity<GuildVotesChannel>(entity => 
         {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildVotesChannel).HasForeignKey<Guild>(t => t.GuildId);
+            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildVotesChannel).HasForeignKey<Guild>(t => t.Id);
         });
 
         modelBuilder.Entity<GuildTicketsChannel>(entity => 
         {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildTicketsChannel).HasForeignKey<Guild>(t => t.GuildId);
+            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildTicketsChannel).HasForeignKey<Guild>(t => t.Id);
         });
 
         modelBuilder.Entity<GuildTicketsGroup>(entity => {
-            entity.HasKey(ut => new { ut.ChannelId });
-
-            entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.ChannelId);
+            entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id);
         });
 
         modelBuilder.Entity<VoteUser>(entity => {
