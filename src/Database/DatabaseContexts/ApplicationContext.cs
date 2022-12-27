@@ -26,28 +26,15 @@ public class ApplicationContext : DbContext
     {
         // Do stuff here
 
-        modelBuilder.Entity<GuildSystemMessagesChannel>(entity => 
-        {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildSystemMessagesChannel).HasForeignKey<Guild>(t => t.Id);
-        });
-
-        modelBuilder.Entity<GuildRolesChannel>(entity => 
-        {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildRolesChannel).HasForeignKey<Guild>(t => t.Id);
-        });
-
-        modelBuilder.Entity<GuildVotesChannel>(entity => 
-        {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildVotesChannel).HasForeignKey<Guild>(t => t.Id);
-        });
-
-        modelBuilder.Entity<GuildTicketsChannel>(entity => 
-        {
-            entity.HasOne(ut => ut.Guild).WithOne(t => t.GuildTicketsChannel).HasForeignKey<Guild>(t => t.Id);
+        modelBuilder.Entity<Guild>(entity => {
+            entity.HasOne(t => t.GuildRolesChannel).WithOne().HasForeignKey<GuildRolesChannel>(t => t.Id).IsRequired(false);
+            entity.HasOne(t => t.GuildSystemMessagesChannel).WithOne().HasForeignKey<GuildSystemMessagesChannel>(t => t.Id).IsRequired(false);
+            entity.HasOne(t => t.GuildTicketsChannel).WithOne().HasForeignKey<GuildTicketsChannel>(t => t.Id).IsRequired(false);
+            entity.HasOne(t => t.GuildVotesChannel).WithOne().HasForeignKey<GuildVotesChannel>().IsRequired(false);
         });
 
         modelBuilder.Entity<GuildTicketsGroup>(entity => {
-            entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id);
+            entity.HasOne(ut => ut.GuildTicketsChannels).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id);
         });
 
         modelBuilder.Entity<VoteUser>(entity => {

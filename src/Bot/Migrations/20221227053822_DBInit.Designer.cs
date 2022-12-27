@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20221226201400_DBInit")]
+    [Migration("20221227053822_DBInit")]
     partial class DBInit
     {
         /// <inheritdoc />
@@ -23,6 +23,7 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.Guild", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("GuildAdminId")
@@ -45,7 +46,6 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("ChannelId")
@@ -54,10 +54,12 @@ namespace Bot.Migrations
                     b.Property<string>("ChannelName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GuildId")
+                    b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
 
                     b.ToTable("GuildRolesChannels");
                 });
@@ -65,7 +67,6 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("ChannelId")
@@ -74,10 +75,12 @@ namespace Bot.Migrations
                     b.Property<string>("ChannelName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GuildId")
+                    b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
 
                     b.ToTable("GuildSystemMessagesChannels");
                 });
@@ -85,7 +88,6 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("ChannelId")
@@ -94,10 +96,12 @@ namespace Bot.Migrations
                     b.Property<string>("ChannelName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GuildId")
+                    b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
 
                     b.ToTable("GuildTicketsChannels");
                 });
@@ -116,7 +120,7 @@ namespace Bot.Migrations
                     b.Property<string>("GroupType")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GuildTicketChannelId")
+                    b.Property<int>("GuildTicketsChannelId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -127,7 +131,6 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("ChannelId")
@@ -136,10 +139,12 @@ namespace Bot.Migrations
                     b.Property<string>("ChannelName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GuildId")
+                    b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
 
                     b.ToTable("GuildVotesChannels");
                 });
@@ -9373,50 +9378,67 @@ namespace Bot.Migrations
                     b.ToTable("VoteUser");
                 });
 
-            modelBuilder.Entity("Database.Models.Guild", b =>
+            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
                 {
-                    b.HasOne("Database.Models.GuildRolesChannel", "GuildRolesChannel")
-                        .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Database.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId");
 
-                    b.HasOne("Database.Models.GuildSystemMessagesChannel", "GuildSystemMessagesChannel")
-                        .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Database.Models.Guild", null)
+                        .WithOne("GuildRolesChannel")
+                        .HasForeignKey("Database.Models.GuildRolesChannel", "Id");
 
-                    b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
-                        .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Guild");
+                });
 
-                    b.HasOne("Database.Models.GuildVotesChannel", "GuildVotesChannel")
-                        .WithOne("Guild")
-                        .HasForeignKey("Database.Models.Guild", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
+                {
+                    b.HasOne("Database.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId");
 
-                    b.Navigation("GuildRolesChannel");
+                    b.HasOne("Database.Models.Guild", null)
+                        .WithOne("GuildSystemMessagesChannel")
+                        .HasForeignKey("Database.Models.GuildSystemMessagesChannel", "Id");
 
-                    b.Navigation("GuildSystemMessagesChannel");
+                    b.Navigation("Guild");
+                });
 
-                    b.Navigation("GuildTicketsChannel");
+            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+                {
+                    b.HasOne("Database.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId");
 
-                    b.Navigation("GuildVotesChannel");
+                    b.HasOne("Database.Models.Guild", null)
+                        .WithOne("GuildTicketsChannel")
+                        .HasForeignKey("Database.Models.GuildTicketsChannel", "Id");
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
                 {
-                    b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
+                    b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannels")
                         .WithMany("GuildTicketsGroups")
                         .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("GuildTicketsChannel");
+                    b.Navigation("GuildTicketsChannels");
+                });
+
+            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
+                {
+                    b.HasOne("Database.Models.Guild", "Guild")
+                        .WithMany()
+                        .HasForeignKey("GuildId");
+
+                    b.HasOne("Database.Models.Guild", null)
+                        .WithOne("GuildVotesChannel")
+                        .HasForeignKey("Database.Models.GuildVotesChannel", "Id");
+
+                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.VoteUser", b =>
@@ -9430,26 +9452,20 @@ namespace Bot.Migrations
                     b.Navigation("Vote");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guild", b =>
                 {
-                    b.Navigation("Guild");
-                });
+                    b.Navigation("GuildRolesChannel");
 
-            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
-                {
-                    b.Navigation("Guild");
+                    b.Navigation("GuildSystemMessagesChannel");
+
+                    b.Navigation("GuildTicketsChannel");
+
+                    b.Navigation("GuildVotesChannel");
                 });
 
             modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
                 {
-                    b.Navigation("Guild");
-
                     b.Navigation("GuildTicketsGroups");
-                });
-
-            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
-                {
-                    b.Navigation("Guild");
                 });
 
             modelBuilder.Entity("Database.Models.Vote", b =>

@@ -94,27 +94,7 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
                     GuildId = Context.Guild.Id,
                     GuildName = Context.Guild.Name,
                     GuildAdminId = Context.Guild.OwnerId,
-                    GuildAdminName = $"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}",
-                    GuildRolesChannel = new GuildRolesChannel
-                    {
-                        ChannelId = 0,
-                        ChannelName = "#INVALID#"
-                    },
-                    GuildSystemMessagesChannel = new GuildSystemMessagesChannel
-                    {
-                        ChannelId = 0,
-                        ChannelName = "#INVALID#"
-                    },
-                    GuildVotesChannel = new GuildVotesChannel
-                    {
-                        ChannelId = 0,
-                        ChannelName = "#INVALID#"
-                    },
-                    GuildTicketsChannel = new GuildTicketsChannel
-                    {
-                        ChannelId = 0,
-                        ChannelName = "#INVALID#"
-                    }
+                    GuildAdminName = @$"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}"
                 });
 
                 await context.SaveChangesAsync();

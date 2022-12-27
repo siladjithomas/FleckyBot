@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models;
 
@@ -24,7 +25,6 @@ public class GuildSystemMessagesChannel
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
 
-    public int GuildId { get; set; }
     public Guild? Guild { get; set; }
 }
 
@@ -35,7 +35,6 @@ public class GuildRolesChannel
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
 
-    public int GuildId { get; set; }
     public Guild? Guild { get; set; }
 }
 
@@ -46,7 +45,6 @@ public class GuildVotesChannel
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
 
-    public int GuildId { get; set; }
     public Guild? Guild { get; set; }
 }
 
@@ -58,7 +56,6 @@ public class GuildTicketsChannel
     public string? ChannelName { get; set; }
     
     public List<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
-    public int GuildId { get; set; }
     public Guild? Guild { get; set; }
 }
 
@@ -70,6 +67,6 @@ public class GuildTicketsGroup
     public string? GroupName { get; set; }
     public string? GroupType { get; set; }
 
-    public GuildTicketsChannel? GuildTicketsChannel { get; set; }
-    public int GuildTicketChannelId { get; set; }
+    public GuildTicketsChannel? GuildTicketsChannels { get; set; }
+    public int GuildTicketsChannelId { get; set; }
 }

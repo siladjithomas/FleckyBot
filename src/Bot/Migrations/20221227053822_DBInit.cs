@@ -13,63 +13,19 @@ namespace Bot.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "GuildRolesChannels",
+                name: "Guilds",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildId = table.Column<int>(type: "INTEGER", nullable: false)
+                    GuildId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GuildName = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildAdminId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GuildAdminName = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GuildRolesChannels", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GuildSystemMessagesChannels",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GuildSystemMessagesChannels", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GuildTicketsChannels",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GuildTicketsChannels", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GuildVotesChannels",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GuildVotesChannels", x => x.Id);
+                    table.PrimaryKey("PK_Guilds", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,63 +71,99 @@ namespace Bot.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GuildTicketsGroups",
+                name: "GuildRolesChannels",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GroupName = table.Column<string>(type: "TEXT", nullable: true),
-                    GroupType = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildTicketChannelId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GuildTicketsGroups", x => x.Id);
+                    table.PrimaryKey("PK_GuildRolesChannels", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GuildTicketsGroups_GuildTicketsChannels_Id",
+                        name: "FK_GuildRolesChannels_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuildRolesChannels_Guilds_Id",
                         column: x => x.Id,
-                        principalTable: "GuildTicketsChannels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Guilds",
+                name: "GuildSystemMessagesChannels",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    GuildId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GuildName = table.Column<string>(type: "TEXT", nullable: true),
-                    GuildAdminId = table.Column<ulong>(type: "INTEGER", nullable: false),
-                    GuildAdminName = table.Column<string>(type: "TEXT", nullable: true)
+                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Guilds", x => x.Id);
+                    table.PrimaryKey("PK_GuildSystemMessagesChannels", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Guilds_GuildRolesChannels_Id",
-                        column: x => x.Id,
-                        principalTable: "GuildRolesChannels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_GuildSystemMessagesChannels_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Guilds_GuildSystemMessagesChannels_Id",
+                        name: "FK_GuildSystemMessagesChannels_Guilds_Id",
                         column: x => x.Id,
-                        principalTable: "GuildSystemMessagesChannels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GuildTicketsChannels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuildTicketsChannels", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Guilds_GuildTicketsChannels_Id",
-                        column: x => x.Id,
-                        principalTable: "GuildTicketsChannels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_GuildTicketsChannels_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Guilds_GuildVotesChannels_Id",
+                        name: "FK_GuildTicketsChannels_Guilds_Id",
                         column: x => x.Id,
-                        principalTable: "GuildVotesChannels",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GuildVotesChannels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    ChannelId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    ChannelName = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuildVotesChannels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GuildVotesChannels_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuildVotesChannels_Guilds_Id",
+                        column: x => x.Id,
+                        principalTable: "Guilds",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -191,6 +183,27 @@ namespace Bot.Migrations
                         name: "FK_VoteUser_Vote_Id",
                         column: x => x.Id,
                         principalTable: "Vote",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GuildTicketsGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupId = table.Column<ulong>(type: "INTEGER", nullable: false),
+                    GroupName = table.Column<string>(type: "TEXT", nullable: true),
+                    GroupType = table.Column<string>(type: "TEXT", nullable: true),
+                    GuildTicketsChannelId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuildTicketsGroups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GuildTicketsGroups_GuildTicketsChannels_Id",
+                        column: x => x.Id,
+                        principalTable: "GuildTicketsChannels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1726,16 +1739,42 @@ namespace Bot.Migrations
                     { 1524ul, "Robert Louis Stevenson, poem written 1876", "And my heart springs up anew,\\nBright and confident and true,\\nAnd the old love comes to meet me, in the dawning and the dew." },
                     { 1525ul, "Alfred Tennyson, Lancelot and Elaine, line 1,298", "I loved you, and my love had no return,\\nAnd therefore my true love has been my death." }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuildRolesChannels_GuildId",
+                table: "GuildRolesChannels",
+                column: "GuildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuildSystemMessagesChannels_GuildId",
+                table: "GuildSystemMessagesChannels",
+                column: "GuildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuildTicketsChannels_GuildId",
+                table: "GuildTicketsChannels",
+                column: "GuildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuildVotesChannels_GuildId",
+                table: "GuildVotesChannels",
+                column: "GuildId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Guilds");
+                name: "GuildRolesChannels");
+
+            migrationBuilder.DropTable(
+                name: "GuildSystemMessagesChannels");
 
             migrationBuilder.DropTable(
                 name: "GuildTicketsGroups");
+
+            migrationBuilder.DropTable(
+                name: "GuildVotesChannels");
 
             migrationBuilder.DropTable(
                 name: "Quote");
@@ -1747,19 +1786,13 @@ namespace Bot.Migrations
                 name: "VoteUser");
 
             migrationBuilder.DropTable(
-                name: "GuildRolesChannels");
-
-            migrationBuilder.DropTable(
-                name: "GuildSystemMessagesChannels");
-
-            migrationBuilder.DropTable(
-                name: "GuildVotesChannels");
-
-            migrationBuilder.DropTable(
                 name: "GuildTicketsChannels");
 
             migrationBuilder.DropTable(
                 name: "Vote");
+
+            migrationBuilder.DropTable(
+                name: "Guilds");
         }
     }
 }

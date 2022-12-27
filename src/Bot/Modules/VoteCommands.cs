@@ -33,23 +33,25 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
         Guild? guild = null;
         SocketTextChannel? channel = null;
+        GuildVotesChannel? votesChannel = null;
 
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
             guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).FirstOrDefault();
+            votesChannel = context.GuildVotesChannels.Where(x => x.Id == guild.Id).FirstOrDefault();
 
-            if (guild != null)
+            if (guild != null && votesChannel != null)
             {
-                _logger.LogInformation("Guild found. Ignoring...");
+                _logger.LogInformation("Guild found. Using channel from database");
+                channel = Context.Guild.GetTextChannel(votesChannel.ChannelId);
             }
             else
             {
-                _logger.LogWarning("Guild not found. Ignoring...");
+                _logger.LogWarning("Guild not found. Using current channel");
+                channel = Context.Guild.GetTextChannel(Context.Channel.Id);
             }
-
-            channel = Context.Guild.GetTextChannel(Context.Channel.Id);
 
             var embed = new EmbedBuilder()
                 .WithTitle($"{Context.User} has a question:")
