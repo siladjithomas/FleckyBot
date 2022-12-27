@@ -21,6 +21,8 @@ public class ApplicationContext : DbContext
     public DbSet<Quote> Quote { get; set; }
     public DbSet<Vote> Vote { get; set; }
     public DbSet<VoteUser> VoteUser { get; set; }
+    public DbSet<Ticket> Ticket { get; set; }
+    public DbSet<TicketMessage> TicketMessage { get; set; } 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,6 +41,10 @@ public class ApplicationContext : DbContext
 
         modelBuilder.Entity<VoteUser>(entity => {
             entity.HasOne(ut => ut.Vote).WithMany(t => t.VoteByUser).HasForeignKey(t => t.Id);
+        });
+
+        modelBuilder.Entity<TicketMessage>(entity => {
+            entity.HasOne(t => t.Ticket).WithMany(t => t.TicketMessages).HasForeignKey(t => t.TicketId).IsRequired(false);
         });
 
         string text = File.ReadAllText(@"./quotesCollection.json");
