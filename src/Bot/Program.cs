@@ -47,6 +47,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 options.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
             else
                 options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+            
+            options.EnableSensitiveDataLogging(true);
         });
 
         {

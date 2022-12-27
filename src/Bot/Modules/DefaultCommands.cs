@@ -99,50 +99,10 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
 
                 await context.SaveChangesAsync();
 
-                SelectMenuBuilder systemMessagesChannel = new SelectMenuBuilder()
-                    .WithCustomId("menu-setup-systemmessages")
-                    .WithPlaceholder("Select a channel for system messages");
-                SelectMenuBuilder votesChannel = new SelectMenuBuilder()
-                    .WithCustomId("menu-setup-votes")
-                    .WithPlaceholder("Select a channel for votes");
-
-                SelectMenuBuilder ticketCategoryChannel = new SelectMenuBuilder()
-                    .WithCustomId("menu-setup-tickets-category")
-                    .WithPlaceholder("Select a category for tickets");
-                SelectMenuBuilder ticketAdminRoleChannel = new SelectMenuBuilder()
-                    .WithCustomId("menu-setup-tickets-role-admin")
-                    .WithPlaceholder("Select a role for admin");
-                SelectMenuBuilder ticketModeratorRoleChannel = new SelectMenuBuilder()
-                    .WithCustomId("menu-setup-tickets-role-moderator")
-                    .WithPlaceholder("Select a role for moderators");
-
-                foreach (SocketTextChannel textChannel in Context.Guild.TextChannels)
-                {
-                    systemMessagesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
-                    votesChannel.AddOption(textChannel.Name, $"{textChannel.Id}");
-                }
-
-                foreach (SocketCategoryChannel categoryChannel in Context.Guild.CategoryChannels)
-                    ticketCategoryChannel.AddOption(categoryChannel.Name, $"{categoryChannel.Id}");
-
-                foreach (SocketRole roles in Context.Guild.Roles)
-                {
-                    ticketAdminRoleChannel.AddOption(roles.Name, $"{roles.Id}");
-                    ticketModeratorRoleChannel.AddOption(roles.Name, $"{roles.Id}");
-                }
-
                 if (channel != null)
-                {
-                    await FollowupAsync("Guild has been set up. Please choose the channels/groups/roles that you would like to use:");
-
-                    await channel.SendMessageAsync("System Messages Channel:", components: new ComponentBuilder().WithSelectMenu(systemMessagesChannel).Build());
-                    await channel.SendMessageAsync("Votes Channel:", components: new ComponentBuilder().WithSelectMenu(votesChannel).Build());
-                    await channel.SendMessageAsync("Ticket Options:", components: new ComponentBuilder().WithSelectMenu(ticketCategoryChannel).WithSelectMenu(ticketAdminRoleChannel).WithSelectMenu(ticketModeratorRoleChannel).Build());
-                }
+                    await FollowupAsync("Guild has been set up. Please use the respective setup tool for each module.");
                 else
-                {
                     await FollowupAsync("Something happened here. I do not know what but yeah...");
-                }
             }
             else
             {

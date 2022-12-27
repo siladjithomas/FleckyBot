@@ -42,59 +42,55 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
 
             if (guild != null)
             {
-                GuildTicketsChannel? guildTicketsChannel = context.GuildTicketsChannels.Where(x => x.Id == guild.Id).FirstOrDefault();
+                _logger.LogDebug("Guild has been found. Continuing....");
 
-                if (guildTicketsChannel == null)
+                if (guild.GuildTicketsChannel == null)
                 {
                     guild.GuildTicketsChannel = new GuildTicketsChannel
                     {
                         ChannelId = categoryChannel.Id,
-                        ChannelName = categoryChannel.Name,
-                        GuildTicketsGroups = new List<GuildTicketsGroup>
+                        ChannelName = categoryChannel.Name
+                    };
+
+                    await context.SaveChangesAsync();
+
+                    _logger.LogInformation("GuildTicketChannel has been updated. Continuing...");
+                }
+                else
+                {
+                    _logger.LogWarning("GuildsTicketChannel is already set up. Continuing...");
+                }
+
+                if (guild.GuildTicketsChannel.GuildTicketsGroups == null)
+                {
+                    guild.GuildTicketsChannel.GuildTicketsGroups = new List<GuildTicketsGroup>
+                    {
+                        new GuildTicketsGroup
                         {
-                            new GuildTicketsGroup
-                            {
-                                GroupId = adminRole.Id,
-                                GroupName = adminRole.Name,
-                                GroupType = "admin"
-                            },
-                            new GuildTicketsGroup
-                            {
-                                GroupId = modRole.Id,
-                                GroupName = modRole.Name,
-                                GroupType = "mod"
-                            }
+                            Id = 1,
+                            GroupId = adminRole.Id,
+                            GroupName = adminRole.Name,
+                            GroupType = "admin"
+                        },
+                        new GuildTicketsGroup
+                        {
+                            Id = 2,
+                            GroupId = modRole.Id,
+                            GroupName = modRole.Name,
+                            GroupType = "mod"
                         }
                     };
 
                     await context.SaveChangesAsync();
+
+                    _logger.LogInformation("Created new GuildTicketsGroups and saved it to database. Continuing...");
                 }
                 else
                 {
-                    guildTicketsChannel = new GuildTicketsChannel
-                    {
-                        Id = guildTicketsChannel.Id,
-                        ChannelId = categoryChannel.Id,
-                        ChannelName = categoryChannel.Name,
-                        GuildTicketsGroups = new List<GuildTicketsGroup>
-                        {
-                            new GuildTicketsGroup
-                            {
-                                GroupId = adminRole.Id,
-                                GroupName = adminRole.Name,
-                                GroupType = "admin"
-                            },
-                            new GuildTicketsGroup
-                            {
-                                GroupId = modRole.Id,
-                                GroupName = modRole.Name,
-                                GroupType = "mod"
-                            }
-                        }
-                    };
-
-                    context.GuildTicketsChannels.Update(guildTicketsChannel);
+                    _logger.LogInformation("GuildSystemGroups list is already existing. Continuing...");
                 }
+
+                await FollowupAsync("Set up ticketing system in database.");
             }
             else
             {

@@ -32,11 +32,11 @@ public class ApplicationContext : DbContext
             entity.HasOne(t => t.GuildRolesChannel).WithOne().HasForeignKey<GuildRolesChannel>(t => t.Id).IsRequired(false);
             entity.HasOne(t => t.GuildSystemMessagesChannel).WithOne().HasForeignKey<GuildSystemMessagesChannel>(t => t.Id).IsRequired(false);
             entity.HasOne(t => t.GuildTicketsChannel).WithOne().HasForeignKey<GuildTicketsChannel>(t => t.Id).IsRequired(false);
-            entity.HasOne(t => t.GuildVotesChannel).WithOne().HasForeignKey<GuildVotesChannel>().IsRequired(false);
+            entity.HasOne(t => t.GuildVotesChannel).WithOne().HasForeignKey<GuildVotesChannel>(t => t.Id).IsRequired(false);
         });
 
         modelBuilder.Entity<GuildTicketsGroup>(entity => {
-            entity.HasOne(ut => ut.GuildTicketsChannels).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id);
+            entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id).IsRequired(false);
         });
 
         modelBuilder.Entity<VoteUser>(entity => {

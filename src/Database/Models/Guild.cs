@@ -20,7 +20,7 @@ public class Guild
 
 public class GuildSystemMessagesChannel
 {
-    [Key]
+    [ForeignKey("Guild")]
     public int Id { get; set; }
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
@@ -30,7 +30,7 @@ public class GuildSystemMessagesChannel
 
 public class GuildRolesChannel
 {
-    [Key]
+    [ForeignKey("Guild")]
     public int Id { get; set; }
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
@@ -40,7 +40,7 @@ public class GuildRolesChannel
 
 public class GuildVotesChannel
 {
-    [Key]
+    [ForeignKey("Guild")]
     public int Id { get; set; }
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
@@ -50,7 +50,7 @@ public class GuildVotesChannel
 
 public class GuildTicketsChannel 
 {
-    [Key]
+    [ForeignKey("Guild")]
     public int Id { get; set; }
     public ulong ChannelId { get; set; }
     public string? ChannelName { get; set; }
@@ -67,6 +67,6 @@ public class GuildTicketsGroup
     public string? GroupName { get; set; }
     public string? GroupType { get; set; }
 
-    public GuildTicketsChannel? GuildTicketsChannels { get; set; }
+    public GuildTicketsChannel? GuildTicketsChannel { get; set; }
     public int GuildTicketsChannelId { get; set; }
 }

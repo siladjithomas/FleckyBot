@@ -3,6 +3,7 @@ using System;
 using Database.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20221227115834_DBGuildTicketTypo")]
+    partial class DBGuildTicketTypo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.1");
@@ -54,9 +57,6 @@ namespace Bot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GuildId1")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId");
@@ -78,9 +78,6 @@ namespace Bot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GuildId1")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId");
@@ -100,9 +97,6 @@ namespace Bot.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("GuildId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("GuildId1")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -148,13 +142,9 @@ namespace Bot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GuildId1")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("GuildId")
-                        .IsUnique();
+                    b.HasIndex("GuildId");
 
                     b.ToTable("GuildVotesChannels");
                 });
@@ -9495,15 +9485,13 @@ namespace Bot.Migrations
 
             modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", null)
-                        .WithOne("GuildVotesChannel")
-                        .HasForeignKey("Database.Models.GuildVotesChannel", "GuildId");
-
                     b.HasOne("Database.Models.Guild", "Guild")
                         .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GuildId");
+
+                    b.HasOne("Database.Models.Guild", null)
+                        .WithOne("GuildVotesChannel")
+                        .HasForeignKey("Database.Models.GuildVotesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
