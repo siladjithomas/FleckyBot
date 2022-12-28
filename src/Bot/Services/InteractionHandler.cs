@@ -23,6 +23,7 @@ public class InteractionHandler
 
         _client.Ready += ReadyAsync;
         _client.SelectMenuExecuted += SelectMenuExectuted;
+        _client.ButtonExecuted += ButtonExecuted;
     }
 
     private async Task ReadyAsync()
@@ -57,6 +58,28 @@ public class InteractionHandler
                 break;
             default:
                 _logger.LogInformation($"Ah snap! I can't do anything with custom id {component.Data.CustomId}!");
+                break;
+        }
+
+        await component.FollowupAsync();
+    }
+
+    private async Task ButtonExecuted(SocketMessageComponent component)
+    {
+        await component.DeferAsync();
+
+        _logger.LogDebug($"Button command has been executed, custom id {component.Data.CustomId}, value {component.Data.Value}");
+
+        switch (component.Data.CustomId)
+        {
+            case "vote-yes":
+                await AddChoiceToVote(component, true);
+                break;
+            case "vote-no":
+                await AddChoiceToVote(component, false);
+                break;
+            default:
+                _logger.LogInformation($"Ah snap. I can't do anything with custom id {component.Data.CustomId}!");
                 break;
         }
 
@@ -101,5 +124,45 @@ public class InteractionHandler
         }
 
         await Task.CompletedTask;
+    }
+
+    private async Task AddChoiceToVote(SocketMessageComponent component, bool choice)
+    {
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            Vote? vote = context.Vote.Where(x => x.MessageId == component.Message.Id).FirstOrDefault();
+
+            if (vote != null && vote.VoteByUser != null)
+            {
+                vote.VoteByUser.Add(new VoteUser
+                {
+                    UserId = component.User.Id,
+                    UserName = component.User.Username,
+                    UserVote = choice
+                });
+
+                await context.SaveChangesAsync();
+            }
+            else if (vote != null && vote.VoteByUser == null)
+            {
+                vote.VoteByUser = new List<VoteUser>
+                {
+                    new VoteUser
+                    {
+                        UserId = component.User.Id,
+                        UserName = component.User.Username,
+                        UserVote = choice
+                    }
+                };
+
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                _logger.LogInformation($"No vote with the message id {component.Message.Id} could be found. Ignoring...");
+            }
+        }
     }
 }
