@@ -31,14 +31,16 @@ public sealed class AudioService
         _lavaNode.OnTrackEnd += OnTrackEndAsync;
     }
 
-    private static Task OnTrackExceptionAsync(TrackExceptionEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
+    private Task OnTrackExceptionAsync(TrackExceptionEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
     {
+        _logger.LogError($"Track {arg.Track.Title} threw an exception. Please check Lavalink console/logs.");
         arg.Player.Vueue.Enqueue(arg.Track);
         return arg.Player.TextChannel.SendMessageAsync($"{arg.Track} has been requeued because it threw an exception.");
     }
 
-    private static Task OnTrackStuckAsync(TrackStuckEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
+    private Task OnTrackStuckAsync(TrackStuckEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
     {
+        _logger.LogError($"Track {arg.Track.Title} got stuck for {arg.Threshold}ms. Please check Lavalink console/logs.");
         arg.Player.Vueue.Enqueue(arg.Track);
         return arg.Player.TextChannel.SendMessageAsync($"{arg.Track} has been requeued because it got stuck.");
     }
@@ -55,18 +57,61 @@ public sealed class AudioService
         return Task.CompletedTask;
     }
 
-    private static Task OnUpdateReceivedAsync(UpdateEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
+    private Task OnUpdateReceivedAsync(UpdateEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
     {
-        return arg.Player.TextChannel.SendMessageAsync($"Player update received: {arg.Position}/{arg.Track?.Duration}");
+        _logger.LogInformation($"Track update received for {arg.Track.Title}: {arg.Position}");
+        return Task.CompletedTask;
     }
 
-    private static Task OnTrackStartAsync(TrackStartEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
+    private async Task OnTrackStartAsync(TrackStartEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
     {
-        return arg.Player.TextChannel.SendMessageAsync($"Started playing {arg.Track}.");
+        var embed = new EmbedBuilder()
+            .WithTitle(arg.Track.Title)
+            .WithDescription(arg.Track.Author)
+            .WithUrl(arg.Track.Url)
+            //.WithImageUrl(await arg.Track.FetchArtworkAsync())
+            .WithColor(Color.Blue)
+            .WithCurrentTimestamp()
+            .WithFooter(new EmbedFooterBuilder().WithText("Flecky Bot").WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG"));
+        
+        await arg.Player.TextChannel.SendMessageAsync(embed: embed.Build());
+        
+        if (!_disconnectTokens.TryGetValue(arg.Player.VoiceChannel.Id, out var value))
+            return;
+        
+        if (value.IsCancellationRequested)
+            return;
+
+        value.Cancel(true);
+
+        await arg.Player.TextChannel.SendMessageAsync("Auto disconnect has been canceled!");
     }
 
-    private static Task OnTrackEndAsync(TrackEndEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
+    private async Task OnTrackEndAsync(TrackEndEventArg<LavaPlayer<LavaTrack>, LavaTrack> arg)
     {
-        return arg.Player.TextChannel.SendMessageAsync($"Finished playing {arg.Track}.");
+        if (arg.Reason != TrackEndReason.Finished)
+            return;
+
+        if (!arg.Player.Vueue.TryDequeue(out var lavaTrack))
+        {
+            var embedComplete = new EmbedBuilder()
+                .WithTitle("Queue completed!")
+                .WithDescription("Please add more tracks to rock n' roll!")
+                .WithColor(Color.Blue)
+                .WithCurrentTimestamp()
+                .WithFooter(new EmbedFooterBuilder().WithText("Flecky Bot").WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG"));
+            
+            await arg.Player.TextChannel.SendMessageAsync(embed: embedComplete.Build());
+            return;
+        }
+        
+        if (lavaTrack is null)
+        {
+            _logger.LogInformation("Next item in queue is not a track.");
+            return;
+        }
+
+        await arg.Player.PlayAsync(lavaTrack);
+        _logger.LogInformation($"{arg.Reason} {arg.Track.Title} -> {lavaTrack.Title}");
     }
 }

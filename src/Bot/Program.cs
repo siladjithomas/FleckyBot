@@ -9,6 +9,7 @@ using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using Victoria;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging((hostContext, logger) => 
@@ -36,10 +37,19 @@ IHost host = Host.CreateDefaultBuilder(args)
 #endif
         };
 
+        services.AddLavaNode(x => 
+        {
+            x.SelfDeaf = true;
+            x.Port = 2333;
+            x.Hostname = "127.0.0.1";
+            x.Authorization = "da-chef123";
+        });
+
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<InteractionHandler>();
+        services.AddSingleton<AudioService>();
 
         services.AddDbContext<ApplicationContext>(options => 
         {
