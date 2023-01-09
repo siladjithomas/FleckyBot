@@ -51,14 +51,6 @@ IHost host = Host.CreateDefaultBuilder(args)
             options.EnableSensitiveDataLogging(true);
         });
 
-        {
-            var builder = new DbContextOptionsBuilder<ApplicationContext>();
-            builder.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
-
-            using var context = new ApplicationContext(builder.Options);
-            context.Database.Migrate();
-        }
-
         services.AddHostedService<Worker>();
 
         services.AddScoped<RequestableRoleManager>();

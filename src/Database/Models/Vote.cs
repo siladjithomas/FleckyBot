@@ -8,6 +8,7 @@ public class Vote
     public int Id { get; set; }
     public ulong MessageId { get; set; }
     public string? QuestionText { get; set; }
+    public bool isOpen { get; set; } = true;
 
     public List<VoteUser>? VoteByUser { get; set; }
 }

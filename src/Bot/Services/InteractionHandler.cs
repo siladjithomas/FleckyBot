@@ -134,13 +134,26 @@ public class InteractionHandler
 
             Vote? vote = context.Vote.Where(x => x.MessageId == component.Message.Id).FirstOrDefault();
 
-            if (vote != null && vote.VoteByUser != null)
+            if (vote != null && vote.VoteByUser?.Count() >= 1)
             {
+                foreach (VoteUser voteUser in vote.VoteByUser)
+                {
+                    _logger.LogDebug($"{voteUser.UserName} ({voteUser.UserId} found.)");
+                    
+                    if (voteUser.UserId == component.User.Id)
+                    {
+                        _logger.LogWarning($"User {voteUser.UserName} ({voteUser.UserId}) found. Skipping....");
+                        return;
+                    }
+                }
+                
                 vote.VoteByUser.Add(new VoteUser
                 {
+                    Id = vote.VoteByUser.Count() + 1,
                     UserId = component.User.Id,
                     UserName = component.User.Username,
-                    UserVote = choice
+                    UserVote = choice,
+                    VoteId = vote.Id
                 });
 
                 await context.SaveChangesAsync();
@@ -151,9 +164,11 @@ public class InteractionHandler
                 {
                     new VoteUser
                     {
+                        Id = vote.VoteByUser.Count() + 1,
                         UserId = component.User.Id,
                         UserName = component.User.Username,
-                        UserVote = choice
+                        UserVote = choice,
+                        VoteId = vote.Id
                     }
                 };
 

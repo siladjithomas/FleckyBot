@@ -40,7 +40,7 @@ public class ApplicationContext : DbContext
         });
 
         modelBuilder.Entity<VoteUser>(entity => {
-            entity.HasOne(ut => ut.Vote).WithMany(t => t.VoteByUser).HasForeignKey(t => t.Id);
+            entity.HasOne(ut => ut.Vote).WithMany(t => t.VoteByUser).HasForeignKey(t => t.Id).IsRequired(false);
         });
 
         modelBuilder.Entity<TicketMessage>(entity => {
