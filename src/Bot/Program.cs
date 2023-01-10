@@ -42,14 +42,14 @@ IHost host = Host.CreateDefaultBuilder(args)
             x.SelfDeaf = true;
             x.Port = 2333;
             x.Hostname = "127.0.0.1";
-            x.Authorization = "da-chef123";
+            x.Authorization = "SomeSecurePassword";
         });
 
+        services.AddSingleton<AudioService>();
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<InteractionHandler>();
-        services.AddSingleton<AudioService>();
 
         services.AddDbContext<ApplicationContext>(options => 
         {
@@ -65,6 +65,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddScoped<RequestableRoleManager>();
     })
+    .UseSystemd()
     .Build();
 
 host.Run();
