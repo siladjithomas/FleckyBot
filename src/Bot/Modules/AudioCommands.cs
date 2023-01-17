@@ -35,6 +35,9 @@ public class AudioCommands : InteractionModuleBase<SocketInteractionContext>
     {
         await DeferAsync(ephemeral: true);
 
+        if (!_lavaNode.IsConnected)
+            await _lavaNode.ConnectAsync();
+
         if (_lavaNode.HasPlayer(Context.Guild))
         {
             _logger.LogWarning($"{Context.User} tried to add another instance into a voice channel, even when the bot is already in a voice channel. Canceling request.");
@@ -115,6 +118,9 @@ public class AudioCommands : InteractionModuleBase<SocketInteractionContext>
             _logger.LogInformation($"This is not a stage channel. Continuing.");
             _logger.LogDebug($"[{exception.Source}] {exception.Message}");
         }
+
+        if (_lavaNode.IsConnected)
+            await _lavaNode.DisconnectAsync();
     }
 
     [SlashCommand("play", "Play a song on the bot")]

@@ -17,28 +17,22 @@ public class InteractionHandler
     private readonly DiscordSocketClient _client;
     private readonly InteractionService _commands;
     private readonly ILogger<Worker> _logger;
-    private readonly LavaNode _lavaNode;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger, LavaNode lavaNode, IServiceScopeFactory scopeFactory)
+    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
     {
         _client = client;
         _commands = commands;
         _logger = logger;
-        _lavaNode = lavaNode;
         _scopeFactory = scopeFactory;
 
         _client.Ready += ReadyAsync;
         _client.SelectMenuExecuted += SelectMenuExectuted;
         _client.ButtonExecuted += ButtonExecuted;
-        _client.Disconnected += DisconnectedAsync;
     }
 
     private async Task ReadyAsync()
     {
-        if (!_lavaNode.IsConnected)
-            await _lavaNode.ConnectAsync();
-
 #if DEBUG
         _logger.LogInformation("In debug mode, adding commands to Guild with ID 799042503570358313...");
         await _commands.RegisterCommandsToGuildAsync(799042503570358313);
@@ -53,13 +47,6 @@ public class InteractionHandler
         await _client.SetStatusAsync(UserStatus.AFK);
 
         _logger.LogInformation($"Status of {_client.CurrentUser} on shard id {_client.ShardId} has been set properly");
-    }
-
-    private async Task DisconnectedAsync(Exception ex)
-    {
-        await _lavaNode.DisconnectAsync();
-
-        _logger.LogWarning($"{ex.Source} {ex.Message}");
     }
 
     private async Task SelectMenuExectuted(SocketMessageComponent component)

@@ -5,6 +5,8 @@ using Discord.Rest;
 using Bot.Services;
 using Database.DatabaseContexts;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Bot.Modules;
 
@@ -38,7 +40,7 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).FirstOrDefault();
+            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).Include(s => s.GuildTicketsChannel).ThenInclude(z => z.GuildTicketsGroups).FirstOrDefault();
 
             if (guild != null)
             {
@@ -58,28 +60,40 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
                 }
                 else
                 {
-                    _logger.LogWarning("GuildsTicketChannel is already set up. Continuing...");
-                }
+                    guild.GuildTicketsChannel.ChannelId = categoryChannel.Id;
+                    guild.GuildTicketsChannel.ChannelName = categoryChannel.Name;
 
+                    await context.SaveChangesAsync();
+                    
+                    _logger.LogWarning("GuildsTicketChannel is already set up. Setting new values...");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Guild has not been set up. User has been notified.");
+                await FollowupAsync("Guild is not set up. Please set it up first with `/setup`!");
+                return;
+            }
+        
+            if (guild.GuildTicketsChannel != null)
+            {
                 if (guild.GuildTicketsChannel.GuildTicketsGroups == null)
                 {
-                    guild.GuildTicketsChannel.GuildTicketsGroups = new List<GuildTicketsGroup>
-                    {
-                        new GuildTicketsGroup
+                    guild.GuildTicketsChannel.GuildTicketsGroups = new List<GuildTicketsGroup>();
+
+                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
                         {
-                            Id = 1,
                             GroupId = adminRole.Id,
                             GroupName = adminRole.Name,
                             GroupType = "admin"
-                        },
-                        new GuildTicketsGroup
+                        });
+                    
+                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
                         {
-                            Id = 2,
                             GroupId = modRole.Id,
                             GroupName = modRole.Name,
                             GroupType = "mod"
-                        }
-                    };
+                        });
 
                     await context.SaveChangesAsync();
 
@@ -87,15 +101,35 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
                 }
                 else
                 {
-                    _logger.LogInformation("GuildSystemGroups list is already existing. Continuing...");
-                }
+                    guild.GuildTicketsChannel.GuildTicketsGroups.RemoveAll(x => x.GuildTicketsChannelId == guild.GuildTicketsChannel.Id);
 
-                await FollowupAsync("Set up ticketing system in database.");
+                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
+                        {
+                            GroupId = adminRole.Id,
+                            GroupName = adminRole.Name,
+                            GroupType = "admin"
+                        });
+                    
+                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
+                        {
+                            GroupId = modRole.Id,
+                            GroupName = modRole.Name,
+                            GroupType = "mod"
+                        });
+
+                    await context.SaveChangesAsync();
+                    
+                    _logger.LogInformation("GuildSystemGroups list is already existing. Setting new values.");
+                }
             }
             else
             {
-                await FollowupAsync("Guild is not set up. Please set it up first with `/setup`!");
+                _logger.LogWarning("Something went wrong while setting up ticket groups. Check database.");
+                await FollowupAsync("Something went wrong while setting up ticket groups! Admin has been notified.");
+                return;
             }
         }
+
+        await FollowupAsync("Setup of ticketing system finished successfully.");
     }
 }

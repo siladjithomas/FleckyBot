@@ -68,5 +68,5 @@ public class GuildTicketsGroup
     public string? GroupType { get; set; }
 
     public GuildTicketsChannel? GuildTicketsChannel { get; set; }
-    public int GuildTicketsChannelId { get; set; }
+    public int? GuildTicketsChannelId { get; set; }
 }

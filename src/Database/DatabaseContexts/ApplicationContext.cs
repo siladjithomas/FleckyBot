@@ -29,22 +29,44 @@ public class ApplicationContext : DbContext
         // Do stuff here
 
         modelBuilder.Entity<Guild>(entity => {
-            entity.HasOne(t => t.GuildRolesChannel).WithOne().HasForeignKey<GuildRolesChannel>(t => t.Id).IsRequired(false);
-            entity.HasOne(t => t.GuildSystemMessagesChannel).WithOne().HasForeignKey<GuildSystemMessagesChannel>(t => t.Id).IsRequired(false);
-            entity.HasOne(t => t.GuildTicketsChannel).WithOne().HasForeignKey<GuildTicketsChannel>(t => t.Id).IsRequired(false);
-            entity.HasOne(t => t.GuildVotesChannel).WithOne().HasForeignKey<GuildVotesChannel>(t => t.Id).IsRequired(false);
+            entity.HasOne<GuildRolesChannel>(t => t.GuildRolesChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildRolesChannel>(t => t.Id)
+                .IsRequired(false);
+
+            entity.HasOne<GuildSystemMessagesChannel>(t => t.GuildSystemMessagesChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildSystemMessagesChannel>(t => t.Id)
+                .IsRequired(false);
+
+            entity.HasOne<GuildTicketsChannel>(t => t.GuildTicketsChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildTicketsChannel>(t => t.Id)
+                .IsRequired(false);
+
+            entity.HasOne<GuildVotesChannel>(t => t.GuildVotesChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildVotesChannel>(t => t.Id)
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<GuildTicketsGroup>(entity => {
-            entity.HasOne(ut => ut.GuildTicketsChannel).WithMany(t => t.GuildTicketsGroups).HasForeignKey(t => t.Id).IsRequired(false);
+            entity.HasOne(ut => ut.GuildTicketsChannel)
+                .WithMany(t => t.GuildTicketsGroups)
+                .HasForeignKey(t => t.GuildTicketsChannelId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<VoteUser>(entity => {
-            entity.HasOne(ut => ut.Vote).WithMany(t => t.VoteByUser).HasForeignKey(t => t.Id).IsRequired(false);
+            entity.HasOne(ut => ut.Vote)
+                .WithMany(t => t.VoteByUser)
+                .HasForeignKey(t => t.Id)
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<TicketMessage>(entity => {
-            entity.HasOne(t => t.Ticket).WithMany(t => t.TicketMessages).HasForeignKey(t => t.TicketId).IsRequired(false);
+            entity.HasOne(t => t.Ticket).WithMany(t => t.TicketMessages).HasForeignKey(t => t.Id).IsRequired(false);
         });
 
         string text = File.ReadAllText(@"./quotesCollection.json");

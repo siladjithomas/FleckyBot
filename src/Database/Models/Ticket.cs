@@ -5,7 +5,7 @@ namespace Database.Models;
 public class Ticket
 {
     [Key]
-    public int TicketId { get; set; }
+    public int Id { get; set; }
     public ulong UserId { get; set; }
     public string? UserName { get; set; }
     public ulong ChannelId { get; set; }
@@ -19,7 +19,7 @@ public class Ticket
 public class TicketMessage
 {
     [Key]
-    public int MessageId { get; set; }
+    public int Id { get; set; }
     public ulong UserId { get; set; }
     public string? UserName { get; set; }
     public string? Message { get; set; }
