@@ -2,7 +2,6 @@ namespace Bot.Models;
 
 public class BotSettings
 {
-    public ulong OwnerId { get; set; }
     public string BotToken { get; set; } = string.Empty;
     public string Prefix { get; set; } = "/";
     public int MessageCacheSize { get; set; }
