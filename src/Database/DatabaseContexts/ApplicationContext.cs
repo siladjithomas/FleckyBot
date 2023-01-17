@@ -62,11 +62,16 @@ public class ApplicationContext : DbContext
             entity.HasOne(ut => ut.Vote)
                 .WithMany(t => t.VoteByUser)
                 .HasForeignKey(t => t.Id)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });
 
         modelBuilder.Entity<TicketMessage>(entity => {
-            entity.HasOne(t => t.Ticket).WithMany(t => t.TicketMessages).HasForeignKey(t => t.Id).IsRequired(false);
+            entity.HasOne(t => t.Ticket)
+                .WithMany(t => t.TicketMessages)
+                .HasForeignKey(t => t.Id)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         });
 
         string text = File.ReadAllText(@"./quotesCollection.json");

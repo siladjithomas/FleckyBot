@@ -5,6 +5,8 @@ using Discord.Rest;
 using Bot.Services;
 using Database.DatabaseContexts;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Bot.Modules;
 
@@ -33,19 +35,17 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
         Guild? guild = null;
         SocketTextChannel? channel = null;
-        GuildVotesChannel? votesChannel = null;
 
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).FirstOrDefault();
-            votesChannel = context.GuildVotesChannels.Where(x => x.Id == guild.Id).FirstOrDefault();
+            guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).Include(y => y.GuildVotesChannel).FirstOrDefault();
 
-            if (guild != null && votesChannel != null)
+            if (guild != null && guild.GuildVotesChannel != null)
             {
                 _logger.LogInformation("Guild found. Using channel from database");
-                channel = Context.Guild.GetTextChannel(votesChannel.ChannelId);
+                channel = Context.Guild.GetTextChannel(guild.GuildVotesChannel.ChannelId);
             }
             else
             {
@@ -85,7 +85,6 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
                 context.Vote.Add(new Vote
                 {
-                    Id = context.Vote.Count() + 1,
                     MessageId = message.Id,
                     QuestionText = question
                 });
@@ -112,13 +111,11 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).FirstOrDefault();
+            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).Include(x => x.GuildVotesChannel).FirstOrDefault();
 
             if (guild != null)
             {
-                GuildVotesChannel? votesChannel = guild.GuildVotesChannel;
-
-                if (votesChannel == null)
+                if (guild.GuildVotesChannel == null)
                 {
                     guild.GuildVotesChannel = new GuildVotesChannel
                     {
@@ -135,7 +132,11 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
                 }
                 else
                 {
-                    await FollowupAsync("I give up. Votes channel not set up.");
+                    guild.GuildVotesChannel.ChannelId = channel.Id;
+                    guild.GuildVotesChannel.ChannelName = channel.Name;
+                    
+                    await FollowupAsync($"Channel {channel.Mention} has been set as Votes channel for guild {Context.Guild.Name}.");
+                    _logger.LogInformation($"Channel {channel} has been set as Votes channel for guild {Context.Guild.Name}.");
                 }
             }
             else
