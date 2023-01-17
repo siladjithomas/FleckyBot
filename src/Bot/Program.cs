@@ -26,7 +26,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         var discordSocketConfig = new DiscordSocketConfig
         {
-            GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages,
+            GatewayIntents = GatewayIntents.All,
             AlwaysDownloadUsers = botSettings.AlwaysDownloadUsers,
             MessageCacheSize = botSettings.MessageCacheSize >= 0 ?
                 botSettings.MessageCacheSize : throw new Exception($"{nameof(botSettings.MessageCacheSize)} must be set to a non negative integer."),
@@ -58,7 +58,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             else
                 options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
             
-            options.EnableSensitiveDataLogging(true);
+            //options.EnableSensitiveDataLogging(true);
         });
 
         services.AddHostedService<Worker>();

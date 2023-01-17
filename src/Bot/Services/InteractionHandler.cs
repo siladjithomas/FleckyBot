@@ -32,6 +32,13 @@ public class InteractionHandler
         _client.SelectMenuExecuted += SelectMenuExectuted;
         _client.ButtonExecuted += ButtonExecuted;
         _client.MessageReceived += MessageReceived;
+        _client.UserBanned += UserBanned;
+        _client.UserUnbanned += UserUnbanned;
+        _client.UserJoined += UserJoined;
+        _client.UserLeft += UserLeft;
+        _client.RoleCreated += RoleCreated;
+        _client.RoleDeleted += RoleDeleted;
+        _client.RoleUpdated += RoleChange;
     }
 
     private async Task ReadyAsync()
@@ -83,6 +90,9 @@ public class InteractionHandler
 
         switch (component.Data.CustomId)
         {
+            case "accept-rules":
+                await RulesAcceptedSetRights(component);
+                break;
             case "vote-yes":
                 await AddChoiceToVote(component, true);
                 break;
@@ -114,10 +124,112 @@ public class InteractionHandler
         await Task.CompletedTask;
     }
 
+    private async Task UserBanned(SocketUser user, SocketGuild guild)
+    {
+        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been banned.");
+        
+        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been banned.");
+    }
+
+    private async Task UserUnbanned(SocketUser user, SocketGuild guild)
+    {
+        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been unbanned.");
+        
+        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been unbanned.");
+    }
+
+    private async Task UserJoined(SocketGuildUser guildUser)
+    {
+        SocketTextChannel? logschannel = guildUser.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+        
+        _logger.LogInformation($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+
+        var defaultRoles = new List<ulong>
+        {
+            969545947799506954
+        };
+
+        await guildUser.AddRolesAsync(defaultRoles);
+
+        _logger.LogInformation($"Added role \"Unverified\" to user {guildUser}.");
+    }
+
+    private async Task UserLeft(SocketGuild guild, SocketUser user)
+    {
+        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+        
+        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+    }
+
+    private async Task RoleChange(SocketRole role1, SocketRole role2)
+    {
+        SocketTextChannel? logschannel = role1.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+        
+        _logger.LogInformation($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+    }
+
+    private async Task RoleCreated(SocketRole role)
+    {
+        SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"Role {role.Name} has been created in guild {role.Guild.Name}.");
+        
+        _logger.LogInformation($"Role {role.Name} has been created in guild {role.Guild.Name}.");
+    }
+
+    private async Task RoleDeleted(SocketRole role)
+    {
+        SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+        if (logschannel != null)
+            await logschannel.SendMessageAsync($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+        
+        _logger.LogInformation($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+    }
+
     /* ----------------------
         private functions
     ---------------------- */
 
+    private async Task RulesAcceptedSetRights(SocketMessageComponent component)
+    {
+        var rulesRemove = new List<ulong>
+        {
+            969545947799506954
+        };
+
+        var rulesAdd = new List<ulong>
+        {
+            936572438140043284,
+            968996826986471434,
+            969008169227538462
+        };
+
+        SocketGuildUser guildUser = (SocketGuildUser)component.User;
+        await guildUser.RemoveRolesAsync(rulesRemove);
+        await guildUser.AddRolesAsync(rulesAdd);
+
+        _logger.LogInformation($"User {guildUser} has accepted the rules on guild.");
+
+        await component.FollowupAsync("Rules have been accepted. Have fun on the server!", ephemeral: true);
+    }
+    
     private async Task ProtocolMessageIfTicket(SocketMessage message)
     {
         using (var scope = _scopeFactory.CreateScope())
