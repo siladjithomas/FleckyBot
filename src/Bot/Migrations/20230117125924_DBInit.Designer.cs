@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230117082807_DBCascadeAdd")]
-    partial class DBCascadeAdd
+    [Migration("20230117125924_DBInit")]
+    partial class DBInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -9368,7 +9368,10 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.TicketMessage", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
@@ -9386,6 +9389,8 @@ namespace Bot.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TicketId");
 
                     b.ToTable("TicketMessage");
                 });
@@ -9415,7 +9420,10 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.VoteUser", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<decimal>("UserId")
                         .HasColumnType("decimal(20,0)");
@@ -9430,6 +9438,8 @@ namespace Bot.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("VoteId");
 
                     b.ToTable("VoteUser");
                 });
@@ -9484,7 +9494,8 @@ namespace Bot.Migrations
                 {
                     b.HasOne("Database.Models.Ticket", "Ticket")
                         .WithMany("TicketMessages")
-                        .HasForeignKey("Id");
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Ticket");
                 });
@@ -9493,7 +9504,8 @@ namespace Bot.Migrations
                 {
                     b.HasOne("Database.Models.Vote", "Vote")
                         .WithMany("VoteByUser")
-                        .HasForeignKey("Id");
+                        .HasForeignKey("VoteId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Vote");
                 });

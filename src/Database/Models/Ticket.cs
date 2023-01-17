@@ -13,7 +13,7 @@ public class Ticket
     public bool IsOpen { get; set; } = true;
     public DateTime TimestampCreated { get; set; }
 
-    public IEnumerable<TicketMessage>? TicketMessages { get; set; }
+    public List<TicketMessage>? TicketMessages { get; set; }
 }
 
 public class TicketMessage

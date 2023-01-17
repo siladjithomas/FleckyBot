@@ -162,7 +162,8 @@ namespace Bot.Migrations
                 name: "TicketMessage",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -173,17 +174,19 @@ namespace Bot.Migrations
                 {
                     table.PrimaryKey("PK_TicketMessage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TicketMessage_Ticket_Id",
-                        column: x => x.Id,
+                        name: "FK_TicketMessage_Ticket_TicketId",
+                        column: x => x.TicketId,
                         principalTable: "Ticket",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "VoteUser",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserVote = table.Column<bool>(type: "bit", nullable: true),
@@ -193,10 +196,11 @@ namespace Bot.Migrations
                 {
                     table.PrimaryKey("PK_VoteUser", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_VoteUser_Vote_Id",
-                        column: x => x.Id,
+                        name: "FK_VoteUser_Vote_VoteId",
+                        column: x => x.VoteId,
                         principalTable: "Vote",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -208,7 +212,7 @@ namespace Bot.Migrations
                     GroupId = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
                     GroupName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GroupType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GuildTicketsChannelId = table.Column<int>(type: "int", nullable: false)
+                    GuildTicketsChannelId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -217,7 +221,8 @@ namespace Bot.Migrations
                         name: "FK_GuildTicketsGroups_GuildTicketsChannels_GuildTicketsChannelId",
                         column: x => x.GuildTicketsChannelId,
                         principalTable: "GuildTicketsChannels",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -2008,6 +2013,16 @@ namespace Bot.Migrations
                 name: "IX_GuildTicketsGroups_GuildTicketsChannelId",
                 table: "GuildTicketsGroups",
                 column: "GuildTicketsChannelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TicketMessage_TicketId",
+                table: "TicketMessage",
+                column: "TicketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VoteUser_VoteId",
+                table: "VoteUser",
+                column: "VoteId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

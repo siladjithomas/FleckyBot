@@ -61,7 +61,7 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<VoteUser>(entity => {
             entity.HasOne(ut => ut.Vote)
                 .WithMany(t => t.VoteByUser)
-                .HasForeignKey(t => t.Id)
+                .HasForeignKey(t => t.VoteId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });
@@ -69,7 +69,7 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<TicketMessage>(entity => {
             entity.HasOne(t => t.Ticket)
                 .WithMany(t => t.TicketMessages)
-                .HasForeignKey(t => t.Id)
+                .HasForeignKey(t => t.TicketId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });
