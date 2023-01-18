@@ -85,6 +85,8 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
                 context.Vote.Add(new Vote
                 {
+                    UserId = Context.User.Id,
+                    UserName = $"{Context.User.Username}#{Context.User.Discriminator}",
                     MessageId = message.Id,
                     QuestionText = question
                 });

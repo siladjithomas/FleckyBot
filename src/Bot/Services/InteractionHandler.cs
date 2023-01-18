@@ -385,6 +385,12 @@ public class InteractionHandler
 
             if (vote != null)
             {
+                if (vote.UserId != component.User.Id)
+                {
+                    await component.FollowupAsync("You did not start the vote. Only the owner of the vote can close the vote.");
+                    return;
+                }
+                
                 vote.isOpen = false;
 
                 await context.SaveChangesAsync();

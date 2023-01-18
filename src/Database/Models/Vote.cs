@@ -6,6 +6,8 @@ public class Vote
 {
     [Key]
     public int Id { get; set; }
+    public ulong UserId { get; set; }
+    public string? UserName { get ; set; }
     public ulong MessageId { get; set; }
     public string? QuestionText { get; set; }
     public bool isOpen { get; set; } = true;
