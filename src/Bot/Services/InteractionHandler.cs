@@ -146,10 +146,27 @@ public class InteractionHandler
 
     private async Task UserJoined(SocketGuildUser guildUser)
     {
-        SocketTextChannel? logschannel = guildUser.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        SocketTextChannel? logsChannel = guildUser.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        SocketTextChannel? welcomeChannel = guildUser.Guild.GetChannel(946996188970905610) as SocketTextChannel;
+        
+        if (welcomeChannel != null)
+        {
+            var embed = new EmbedBuilder()
+            .WithTitle($"Welcome to the Server, {guildUser}!")
+            .WithDescription("Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
+            .WithCurrentTimestamp()
+            .WithColor(Color.Magenta)
+            .WithFooter(new EmbedFooterBuilder()
+                .WithText("Executed by FleckyBot#3339")
+                .WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
+            .WithThumbnailUrl(guildUser.GetAvatarUrl())
+            .WithImageUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG");
+        
+            await welcomeChannel.SendMessageAsync(embed: embed.Build());
+        }
 
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+        if (logsChannel != null)
+            await logsChannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
         
         _logger.LogInformation($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
 
@@ -166,6 +183,10 @@ public class InteractionHandler
     private async Task UserLeft(SocketGuild guild, SocketUser user)
     {
         SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        SocketTextChannel? goodbyeChannel = guild.GetChannel(946996188970905610) as SocketTextChannel;
+
+        if (goodbyeChannel != null)
+            await goodbyeChannel.SendMessageAsync($"**{user}** just left the guild. Adieu!");
 
         if (logschannel != null)
             await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
