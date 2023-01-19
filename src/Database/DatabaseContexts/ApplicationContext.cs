@@ -23,6 +23,7 @@ public class ApplicationContext : DbContext
     public DbSet<VoteUser> VoteUser { get; set; }
     public DbSet<Ticket> Ticket { get; set; }
     public DbSet<TicketMessage> TicketMessage { get; set; } 
+    public DbSet<Image> Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,8 +75,8 @@ public class ApplicationContext : DbContext
                 .IsRequired(false);
         });
 
-        string text = File.ReadAllText(@"./quotesCollection.json");
-        List<QuoteJson>? quotes = JsonSerializer.Deserialize<List<QuoteJson>>(text);
+        string textQuotes = File.ReadAllText(@"./quotesCollection.json");
+        List<QuoteJson>? quotes = JsonSerializer.Deserialize<List<QuoteJson>>(textQuotes);
         var quotesInList = new List<Quote>();
         ulong id = 1;
 
@@ -95,6 +96,12 @@ public class ApplicationContext : DbContext
             }
 
         modelBuilder.Entity<Quote>().HasData(quotesInList);
+
+        string textImages = File.ReadAllText(@"./imagesCollection.json");
+        List<Image>? images = JsonSerializer.Deserialize<List<Image>>(textImages);
+
+        if (images != null)
+            modelBuilder.Entity<Image>().HasData(images);
         
         base.OnModelCreating(modelBuilder);
     }
