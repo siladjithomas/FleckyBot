@@ -118,9 +118,6 @@ public class AudioCommands : InteractionModuleBase<SocketInteractionContext>
             _logger.LogInformation($"This is not a stage channel. Continuing.");
             _logger.LogDebug($"[{exception.Source}] {exception.Message}");
         }
-
-        if (_lavaNode.IsConnected)
-            await _lavaNode.DisconnectAsync();
     }
 
     [SlashCommand("play", "Play a song on the bot")]
