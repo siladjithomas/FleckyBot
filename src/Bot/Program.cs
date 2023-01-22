@@ -8,7 +8,6 @@ using Discord.WebSocket;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Serilog.Events;
 using Victoria;
 
 IHost host = Host.CreateDefaultBuilder(args)

@@ -10,20 +10,20 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) {}
 
-    public DbSet<RequestableRole> RequestableRoles { get; set; }
+    public DbSet<RequestableRole>? RequestableRoles { get; set; }
 
-    public DbSet<Guild> Guilds { get; set; }
-    public DbSet<GuildSystemMessagesChannel> GuildSystemMessagesChannels { get; set; }
-    public DbSet<GuildRolesChannel> GuildRolesChannels { get; set; }
-    public DbSet<GuildVotesChannel> GuildVotesChannels { get; set; }
-    public DbSet<GuildTicketsChannel> GuildTicketsChannels { get; set; }
-    public DbSet<GuildTicketsGroup> GuildTicketsGroups { get; set; }
-    public DbSet<Quote> Quote { get; set; }
-    public DbSet<Vote> Vote { get; set; }
-    public DbSet<VoteUser> VoteUser { get; set; }
-    public DbSet<Ticket> Ticket { get; set; }
-    public DbSet<TicketMessage> TicketMessage { get; set; } 
-    public DbSet<Image> Images { get; set; }
+    public DbSet<Guild>? Guilds { get; set; }
+    public DbSet<GuildSystemMessagesChannel>? GuildSystemMessagesChannels { get; set; }
+    public DbSet<GuildRolesChannel>? GuildRolesChannels { get; set; }
+    public DbSet<GuildVotesChannel>? GuildVotesChannels { get; set; }
+    public DbSet<GuildTicketsChannel>? GuildTicketsChannels { get; set; }
+    public DbSet<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
+    public DbSet<Quote>? Quote { get; set; }
+    public DbSet<Vote>? Vote { get; set; }
+    public DbSet<VoteUser>? VoteUser { get; set; }
+    public DbSet<Ticket>? Ticket { get; set; }
+    public DbSet<TicketMessage>? TicketMessage { get; set; } 
+    public DbSet<Image>? Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -83,14 +83,18 @@ public class ApplicationContext : DbContext
         if (quotes != null)
             foreach (QuoteJson quote in quotes)
             {
-                var combinedQuotes = String.Join(@"\n", quote.quote);
+                var combinedQuotes = "";
                 
-                quotesInList.Add(new Quote
-                {
-                    Id = id,
-                    QuoteText = combinedQuotes,
-                    QuoteAuthor = quote.author
-                });
+                if (quote.quote != null)
+                    combinedQuotes = String.Join(@"\n", quote.quote);
+                
+                if (quote.author != null)
+                    quotesInList.Add(new Quote
+                    {
+                        Id = id,
+                        QuoteText = combinedQuotes,
+                        QuoteAuthor = quote.author
+                    });
 
                 id++;
             }

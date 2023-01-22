@@ -1,4 +1,4 @@
-namespace Web;
+namespace Web.Data;
 
 public class WeatherForecast
 {
