@@ -29,8 +29,8 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
     [SlashCommand("setup", "Setup the settings for the ticketing system")]
     public async Task SetupTicketSystem(SocketCategoryChannel categoryChannel, SocketRole adminRole, SocketRole modRole)
     {
-        if (Context.Guild.OwnerId != Context.User.Id)
-            return;
+        // if (Context.Guild.OwnerId != Context.User.Id)
+        //     return;
 
         await DeferAsync(ephemeral: true);
 

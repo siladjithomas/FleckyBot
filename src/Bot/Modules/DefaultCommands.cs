@@ -111,4 +111,21 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             }
         }
     }
+
+    [SlashCommand("pat", "With this you can pat Flecky")]
+    public async Task PatFlecky()
+    {
+        await DeferAsync();
+
+        var embed = new EmbedBuilder()
+            .WithAuthor(Context.User)
+            .WithFooter(new EmbedFooterBuilder().WithText("Patting Flecky, since 2023"))
+            .WithImageUrl("https://media.discordapp.net/attachments/974447018313408522/974447493557395506/IMG_4177.JPG")
+            .WithTitle("Flecky got a headpat!")
+            .WithDescription($"Flecky has been patted by {Context.User.Mention}!")
+            .WithColor(Color.DarkMagenta)
+            .WithCurrentTimestamp();
+
+        await FollowupAsync(embed: embed.Build());
+    }
 }

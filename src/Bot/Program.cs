@@ -9,6 +9,7 @@ using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Victoria;
+using Quartz;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging((hostContext, logger) => 
@@ -42,6 +43,18 @@ IHost host = Host.CreateDefaultBuilder(args)
             x.Port = 2333;
             x.Hostname = "127.0.0.1";
             x.Authorization = "SomeSecurePassword";
+        });
+
+        services.AddQuartz(q => 
+        {
+            q.UseMicrosoftDependencyInjectionJobFactory();
+
+            q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
+        });
+
+        services.AddQuartzHostedService(opt =>
+        {
+            opt.WaitForJobsToComplete = true;
         });
 
         services.AddSingleton<AudioService>();

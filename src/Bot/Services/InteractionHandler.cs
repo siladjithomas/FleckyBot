@@ -45,7 +45,10 @@ public class InteractionHandler
     {
 #if DEBUG
         _logger.LogInformation("In debug mode, adding commands to Guild with ID 799042503570358313...");
+        // Flecky's Server
         await _commands.RegisterCommandsToGuildAsync(799042503570358313);
+        // Afterlife <3
+        await _commands.RegisterCommandsToGuildAsync(1114203792737579102);
 #else
         _logger.LogInformation("In production mode, adding commands globally...");
         await _commands.RegisterCommandsGloballyAsync(true);
@@ -53,7 +56,7 @@ public class InteractionHandler
 
         _logger.LogInformation($"Logged in as {_client.CurrentUser}, shard id {_client.ShardId}");
 
-        await _client.SetActivityAsync(new Game("slash commands", ActivityType.Listening, ActivityProperties.None));
+        await _client.SetActivityAsync(new Game("woof woof", ActivityType.Listening, ActivityProperties.None));
         await _client.SetStatusAsync(UserStatus.AFK);
 
         _logger.LogInformation($"Status of {_client.CurrentUser} on shard id {_client.ShardId} has been set properly");

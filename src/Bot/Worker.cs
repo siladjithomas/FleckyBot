@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Models;
 using Bot.Services;
+using Quartz;
 
 namespace Bot;
 
