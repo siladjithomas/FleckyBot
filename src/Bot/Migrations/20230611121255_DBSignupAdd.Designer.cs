@@ -4,6 +4,7 @@ using Database.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230611121255_DBSignupAdd")]
+    partial class DBSignupAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,23 +64,6 @@ namespace Bot.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GuildRolesChannels");
-                });
-
-            modelBuilder.Entity("Database.Models.GuildSignupChannel", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ChannelId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GuildSignupChannel");
                 });
 
             modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
@@ -9576,16 +9562,8 @@ namespace Bot.Migrations
                     b.Property<DateTime>("EventStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(90)
-                        .HasColumnType("nvarchar(90)");
-
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("isOnDiscord")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -9807,15 +9785,6 @@ namespace Bot.Migrations
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSignupChannel", b =>
-                {
-                    b.HasOne("Database.Models.Guild", "Guild")
-                        .WithOne("GuildSignupChannel")
-                        .HasForeignKey("Database.Models.GuildSignupChannel", "Id");
-
-                    b.Navigation("Guild");
-                });
-
             modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
                 {
                     b.HasOne("Database.Models.Guild", "Guild")
@@ -9921,8 +9890,6 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.Guild", b =>
                 {
                     b.Navigation("GuildRolesChannel");
-
-                    b.Navigation("GuildSignupChannel");
 
                     b.Navigation("GuildSystemMessagesChannel");
 

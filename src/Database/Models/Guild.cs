@@ -16,6 +16,7 @@ public class Guild
     public GuildRolesChannel? GuildRolesChannel { get; set; }
     public GuildVotesChannel? GuildVotesChannel { get; set; }
     public GuildTicketsChannel? GuildTicketsChannel { get; set; }
+    public GuildSignupChannel? GuildSignupChannel { get; set; }
 }
 
 public class GuildSystemMessagesChannel
@@ -69,4 +70,14 @@ public class GuildTicketsGroup
 
     public GuildTicketsChannel? GuildTicketsChannel { get; set; }
     public int? GuildTicketsChannelId { get; set; }
+}
+
+public class GuildSignupChannel
+{
+    [ForeignKey("Guild")]
+    public int Id { get; set; }
+    public ulong ChannelId { get; set; }
+    public string ChannelName { get; set; } = string.Empty;
+    
+    public Guild? Guild { get; set; }
 }

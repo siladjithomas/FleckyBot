@@ -24,6 +24,11 @@ public class ApplicationContext : DbContext
     public DbSet<Ticket>? Ticket { get; set; }
     public DbSet<TicketMessage>? TicketMessage { get; set; } 
     public DbSet<Image>? Images { get; set; }
+	public DbSet<Signup>? Signup { get; set; }
+	public DbSet<SignupAllowedGroup>? SignupAllowedGroup { get; set; }
+	public DbSet<SignupAllowedToEdit>? SignupAllowedToEdit { get; set; }
+	public DbSet<SignupCategory>? SignupCategory { get; set; }
+	public DbSet<SignupAttendee>? SignupAttendee { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +53,11 @@ public class ApplicationContext : DbContext
             entity.HasOne<GuildVotesChannel>(t => t.GuildVotesChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildVotesChannel>(t => t.Id)
+                .IsRequired(false);
+
+            entity.HasOne<GuildSignupChannel>(t => t.GuildSignupChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildSignupChannel>(t => t.Id)
                 .IsRequired(false);
         });
 
@@ -74,6 +84,28 @@ public class ApplicationContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });
+
+		modelBuilder.Entity<SignupCategory>(entity => {
+			entity.HasOne(s => s.Signup)
+				.WithMany(s => s.SignupCategories)
+				.HasForeignKey(s => s.SignupId)
+				.OnDelete(DeleteBehavior.Cascade)
+				.IsRequired(false);
+		});
+
+		modelBuilder.Entity<SignupAllowedToEdit>(entity => {
+			entity.HasOne(s => s.Signup)
+				.WithMany(s => s.SignupAllowedToEdit)
+				.OnDelete(DeleteBehavior.Cascade)
+				.IsRequired(false);
+		});
+
+		modelBuilder.Entity<SignupAllowedGroup>(entity => {
+			entity.HasOne(s => s.Signup)
+				.WithMany(s => s.SignupRestrictedTo)
+				.OnDelete(DeleteBehavior.Cascade)
+				.IsRequired(false);
+		});
 
         string textQuotes = File.ReadAllText(@"./quotesCollection.json");
         List<QuoteJson>? quotes = JsonSerializer.Deserialize<List<QuoteJson>>(textQuotes);
