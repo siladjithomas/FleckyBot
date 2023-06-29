@@ -4,6 +4,11 @@ using Discord.WebSocket;
 using Bot.Models;
 using Database.DatabaseContexts;
 using Database.Models;
+using Telegram.Bot;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Victoria;
 using Victoria.Node;
 using Victoria.Node.EventArgs;
@@ -56,7 +61,7 @@ public class InteractionHandler
 
         _logger.LogInformation($"Logged in as {_client.CurrentUser}, shard id {_client.ShardId}");
 
-        await _client.SetActivityAsync(new Game("woof woof", ActivityType.Listening, ActivityProperties.None));
+        await _client.SetActivityAsync(new Discord.Game("woof woof", ActivityType.Listening, ActivityProperties.None));
         await _client.SetStatusAsync(UserStatus.AFK);
 
         _logger.LogInformation($"Status of {_client.CurrentUser} on shard id {_client.ShardId} has been set properly");
@@ -158,7 +163,7 @@ public class InteractionHandler
             .WithTitle($"Welcome to the Server, {guildUser}!")
             .WithDescription("Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
             .WithCurrentTimestamp()
-            .WithColor(Color.Magenta)
+            .WithColor(Discord.Color.Magenta)
             .WithFooter(new EmbedFooterBuilder()
                 .WithText("Executed by FleckyBot#3339")
                 .WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
@@ -495,7 +500,7 @@ public class InteractionHandler
                 var embedTicket = new EmbedBuilder()
                     .WithTitle($"{component.User.Username}'s Ticket")
                     .WithDescription($"This is a ticket that only the group {mentionedRole} and you can see. Write along\n\nIf you are finished with the ticket, click the Close button.")
-                    .WithColor(Color.Magenta)
+                    .WithColor(Discord.Color.Magenta)
                     .WithCurrentTimestamp()
                     .WithFooter(new EmbedFooterBuilder().WithText($"Executed by {component.User}").WithIconUrl(component.User.GetAvatarUrl()));
 

@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Telegram.Bot;
 using Victoria;
 using Quartz;
 
@@ -21,6 +22,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
         var botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>();
+        var telegramBotSettings = hostContext.Configuration.GetSection("Telegram").Get<TelegramBotSettings>();
 
         services.AddSingleton(botSettings);
 
@@ -57,11 +59,16 @@ IHost host = Host.CreateDefaultBuilder(args)
             opt.WaitForJobsToComplete = true;
         });
 
+        // setting up discord related stuff
         services.AddSingleton<AudioService>();
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<InteractionHandler>();
+
+        // setting up telegram related stuff
+        services.AddSingleton(new TelegramBotClient(telegramBotSettings.AccessToken));
+		services.AddSingleton<TelegramInteractionHandler>();
 
         services.AddDbContext<ApplicationContext>(options => 
         {
@@ -74,6 +81,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         services.AddHostedService<Worker>();
+        services.AddHostedService<TelegramWorker>();
 
         services.AddScoped<RequestableRoleManager>();
     })
