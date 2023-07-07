@@ -30,6 +30,11 @@ public class ApplicationContext : DbContext
 	public DbSet<SignupCategory>? SignupCategory { get; set; }
 	public DbSet<SignupAttendee>? SignupAttendee { get; set; }
 
+    // Telegram related tables
+    public DbSet<TelegramUser>? TelegramUser { get; set; }
+    public DbSet<TelegramChat>? TelegramChat { get; set; }
+    public DbSet<TelegramMessage>? TelegramMessage { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Do stuff here
@@ -106,6 +111,20 @@ public class ApplicationContext : DbContext
 				.OnDelete(DeleteBehavior.Cascade)
 				.IsRequired(false);
 		});
+
+        modelBuilder.Entity<TelegramMessage>(entity => {
+            entity.HasOne(s => s.Chat)
+                .WithMany(s => s.Messages)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<TelegramChat>(entity => {
+            entity.HasOne(s => s.User)
+                .WithMany(s => s.Chats)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
 
         string textQuotes = File.ReadAllText(@"./quotesCollection.json");
         List<QuoteJson>? quotes = JsonSerializer.Deserialize<List<QuoteJson>>(textQuotes);

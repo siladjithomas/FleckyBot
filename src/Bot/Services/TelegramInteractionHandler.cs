@@ -48,6 +48,8 @@ public class TelegramInteractionHandler
         if (message.Text is not { } messageText)
             return;
 
+        
+
         var chatId = message.Chat.Id;
 		var name = !string.IsNullOrEmpty(message.Chat.LastName) ? $"{message.Chat.FirstName} {message.Chat.LastName}" : message.Chat.FirstName;
 
@@ -100,6 +102,42 @@ public class TelegramInteractionHandler
             );
 
             return;
+        }
+
+        // If no slash command has been run, log the conversation
+
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            TelegramUser? userInDB = await context.TelegramUser.Where(x => x.FirstName == message.Chat.FirstName).FirstOrDefaultAsync();
+
+            if (userInDB == null)
+            {
+                TelegramUser newUser = new TelegramUser
+                {
+                    FirstName = message.Chat.FirstName,
+                    LastName = message.Chat.LastName,
+                    PhoneNumber = null,
+                    UserId = 0
+                };
+
+                await context.TelegramUser.AddAsync(newUser);
+
+                await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"Added user {newUser.FirstName} in DB!",
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
+
+                return;
+            }
+
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: $"User {userInDB.FirstName} found!",
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
         }
     }
 
