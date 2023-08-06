@@ -54,6 +54,8 @@ public class InteractionHandler
         await _commands.RegisterCommandsToGuildAsync(799042503570358313);
         // Afterlife <3
         await _commands.RegisterCommandsToGuildAsync(1114203792737579102);
+	// Garden of Even
+	await _commands.RegisterCommandsToGuildAsync(1010646571567816734);
 #else
         _logger.LogInformation("In production mode, adding commands globally...");
         await _commands.RegisterCommandsGloballyAsync(true);
