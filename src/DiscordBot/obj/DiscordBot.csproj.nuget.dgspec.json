@@ -1,25 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "/Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj": {}
+    "/home/thomas/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj": {}
   },
   "projects": {
-    "/Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj": {
+    "/home/thomas/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj",
+        "projectUniqueName": "/home/thomas/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj",
         "projectName": "DiscordBot",
-        "projectPath": "/Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj",
-        "packagesPath": "/Users/thomas/.nuget/packages/",
-        "outputPath": "/Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/obj/",
+        "projectPath": "/home/thomas/Projects/FleckyBot/src/DiscordBot/DiscordBot.csproj",
+        "packagesPath": "/home/thomas/.nuget/packages/",
+        "outputPath": "/home/thomas/Projects/FleckyBot/src/DiscordBot/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/thomas/.nuget/NuGet/NuGet.Config"
+          "/home/thomas/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "/home/thomas/.dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -59,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/home/thomas/.dotnet/sdk/6.0.404/RuntimeIdentifierGraph.json"
         }
       }
     }
