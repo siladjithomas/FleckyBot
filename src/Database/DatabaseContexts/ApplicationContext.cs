@@ -35,6 +35,9 @@ public class ApplicationContext : DbContext
     public DbSet<TelegramChat>? TelegramChat { get; set; }
     public DbSet<TelegramMessage>? TelegramMessage { get; set; }
 
+    // Birthday related tables
+    public DbSet<BirthdayUser>? BirthdayUser { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Do stuff here

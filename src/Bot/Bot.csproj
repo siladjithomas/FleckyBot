@@ -45,5 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\DiscordBot\DiscordBot.csproj" />
+    <ProjectReference Include="..\TelegramBot\TelegramBot.csproj" />
   </ItemGroup>
 </Project>
