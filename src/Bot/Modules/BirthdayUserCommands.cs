@@ -118,7 +118,7 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
         var embed = new EmbedBuilder()
             .WithTitle("All birthdays in this server")
             .WithDescription("All those birthdays have been saved in this server")
-            .WithFooter(new EmbedFooterBuilder().WithText($"Command has been run by {Context.User.Username}.").WithIconUrl(Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl()))
+            .WithFooter(new EmbedFooterBuilder().WithText($"Command has been run by {Context.User.Username}").WithIconUrl(Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl()))
             .WithCurrentTimestamp();
 
         if (allBirthdays != null)
@@ -126,5 +126,34 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
                 embed.AddField(new EmbedFieldBuilder().WithIsInline(true).WithName(Context.Guild.GetUser(bdUser.UserId).Username).WithValue(bdUser.Birthday.Date));
 
         await FollowupAsync(embed: embed.Build());
+    }
+
+    [SlashCommand("delete", "Delete your birthday from this server")]
+    public async Task DeleteBirthday(bool thisGuildOnly = true)
+    {
+        if (Context.User.IsBot)
+            return;
+
+        await DeferAsync(ephemeral: true);
+
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            List<BirthdayUser>? users = null;
+
+            if (thisGuildOnly)
+                users = context.BirthdayUser?.Where(x => x.GuildId == Context.Guild.Id && x.UserId == Context.User.Id).ToList();
+            else
+                users = context.BirthdayUser?.Where(x => x.UserId == Context.User.Id).ToList();
+
+            if (users != null)
+            {
+                context.BirthdayUser?.RemoveRange(users);
+                await FollowupAsync($"Birthday from user {Context.User.Username} has been deleted from the database.");
+            }
+            else
+                await FollowupAsync("No Birthdays have been found in the database. Nothing to delete.");
+        }        
     }
 }
