@@ -150,6 +150,7 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
             if (users != null)
             {
                 context.BirthdayUser?.RemoveRange(users);
+                context.SaveChanges();
                 await FollowupAsync($"Birthday from user {Context.User.Username} has been deleted from the database.");
             }
             else
