@@ -33,6 +33,8 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
 
         await DeferAsync(ephemeral: true);
 
+        string userInQuestionName = user == null ? Context.User.Username : user.Username;
+
         // TODO: set the birthday to the user and save it
         using (var scope = _scopeFactory.CreateScope())
         {
@@ -47,7 +49,7 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
                 BirthdayUser newBirithdayUser = new BirthdayUser
                 {
                     GuildId = Context.Guild.Id,
-                    UserId = Context.User.Id,
+                    UserId = userInQuestion,
                     Birthday = birthday
                 };
 
@@ -62,7 +64,7 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
             }
         }
 
-        await FollowupAsync($"Birthday of user {Context.User.Username} has been set to {birthday.ToString()}");
+        await FollowupAsync($"Birthday of user {userInQuestionName} has been set to {birthday.ToString()}");
     }
 
     [SlashCommand("get", "Get the birthday of the current user or the set user")]
@@ -72,6 +74,8 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
             return;
 
         await DeferAsync(ephemeral: true);
+
+        string userInQuestionName = user == null ? Context.User.Username : user.Username;
 
         DateTime? setBirthday = null;
 
@@ -88,8 +92,8 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
         }
 
         if (setBirthday != null)
-            await FollowupAsync($"Birthday of user {Context.User.Username} is set to {setBirthday.ToString()}");
+            await FollowupAsync($"Birthday of user {userInQuestionName} is set to {setBirthday.ToString()}");
         else
-            await FollowupAsync($"Birthday of user {Context.User.Username} is not set. ");
+            await FollowupAsync($"Birthday of user {userInQuestionName} is not set.");
     }
 }
