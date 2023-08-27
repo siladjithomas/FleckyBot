@@ -48,8 +48,6 @@
 /Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/obj/Debug/net6.0/DiscordBot.pdb
 /Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/obj/Debug/net6.0/DiscordBot.genruntimeconfig.cache
 /Users/thomas/Documents/Projects/FleckyBot/src/DiscordBot/obj/Debug/net6.0/ref/DiscordBot.dll
-/home/thomas/Projects/FleckyBot/src/DiscordBot/bin/Debug/net6.0/appsettings.Development.json
-/home/thomas/Projects/FleckyBot/src/DiscordBot/bin/Debug/net6.0/appsettings.json
 /home/thomas/Projects/FleckyBot/src/DiscordBot/bin/Debug/net6.0/DiscordBot
 /home/thomas/Projects/FleckyBot/src/DiscordBot/bin/Debug/net6.0/DiscordBot.deps.json
 /home/thomas/Projects/FleckyBot/src/DiscordBot/bin/Debug/net6.0/DiscordBot.runtimeconfig.json

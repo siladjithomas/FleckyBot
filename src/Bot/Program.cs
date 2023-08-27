@@ -52,6 +52,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             q.UseMicrosoftDependencyInjectionJobFactory();
 
             q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
+            //q.AddJobAndTrigger<CheckDMMessages>(hostContext.Configuration);
         });
 
         services.AddQuartzHostedService(opt =>

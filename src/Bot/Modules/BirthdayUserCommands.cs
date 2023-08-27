@@ -99,6 +99,7 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
 
     [SlashCommand("getall", "Get all birthdays of the members in this guild")]
     [RequireOwner]
+    [RequireContext(ContextType.Guild)]
     public async Task GetAllBirthdays()
     {
         if (Context.User.IsBot)
@@ -124,6 +125,38 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
         if (allBirthdays != null)
             foreach (BirthdayUser bdUser in allBirthdays)
                 embed.AddField(new EmbedFieldBuilder().WithIsInline(true).WithName(Context.Guild.GetUser(bdUser.UserId).Username).WithValue(bdUser.Birthday.Date));
+
+        await FollowupAsync(embed: embed.Build());
+    }
+
+    [SlashCommand("getallsrv", "Get all birthdays from all servers")]
+    [RequireOwner]
+    [RequireContext(ContextType.DM)]
+    public async Task GetAllBirthdaysInDMs()
+    {
+        if (Context.User.IsBot)
+            return;
+
+        await DeferAsync(ephemeral: true);
+
+        List<BirthdayUser>? allBirthdays = null;
+
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            allBirthdays = context.BirthdayUser?.ToList();
+        }
+
+        var embed = new EmbedBuilder()
+            .WithTitle("All birthdays on all servers")
+            .WithDescription("All those birthdays have been saved in this server")
+            .WithFooter(new EmbedFooterBuilder().WithText($"Command has been run by {Context.User.Username}").WithIconUrl(Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl()))
+            .WithCurrentTimestamp();
+
+        if (allBirthdays != null)
+            foreach (BirthdayUser bdUser in allBirthdays)
+                embed.AddField(new EmbedFieldBuilder().WithIsInline(true).WithName($"{bdUser.UserId} ({bdUser.GuildId})").WithValue(bdUser.Birthday.Date));
 
         await FollowupAsync(embed: embed.Build());
     }

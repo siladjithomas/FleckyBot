@@ -16,6 +16,7 @@ using Victoria.Player;
 using Victoria.Responses.Search;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Reflection.Emit;
 
 namespace Bot.Services;
 
@@ -44,6 +45,7 @@ public class InteractionHandler
         _client.RoleCreated += RoleCreated;
         _client.RoleDeleted += RoleDeleted;
         _client.RoleUpdated += RoleChange;
+        _client.ModalSubmitted += ModalSubmitted;
     }
 
     private async Task ReadyAsync()
@@ -94,9 +96,23 @@ public class InteractionHandler
 
     private async Task ButtonExecuted(SocketMessageComponent component)
     {
-        await component.DeferAsync(ephemeral: true);
-
         _logger.LogDebug($"Button command has been executed, custom id {component.Data.CustomId}, value {component.Data.Value}");
+
+        // regarding DMs, because there is no way to send a custom value with an custom id, at least not with a button,
+        // I check if the custom ID contains a specific value and get it's channel id from it
+        if (component.Data.CustomId.Contains("dm-respond-channel-"))
+        {
+            _logger.LogDebug("DM will be responded, please wait...");
+            var words = component.Data.CustomId.Split("-");
+            
+            var channelId = words[3];
+            _logger.LogDebug($"Channel ID: {channelId}");
+
+            await ShowModalForReplyDM(component, channelId);
+            return;
+        }
+
+        await component.DeferAsync(ephemeral: true);
 
         switch (component.Data.CustomId)
         {
@@ -127,6 +143,29 @@ public class InteractionHandler
     {
         if (!message.Author.IsBot)
         {
+            if (message.Channel is SocketDMChannel)
+            {
+                _logger.LogInformation("Received a message from a DM!");
+
+                var guild = _client.GetGuild(799042503570358313);
+                var dmChannel = guild.GetTextChannel(1145373068462661662);
+
+                var dmEmbed = new EmbedBuilder()
+                    .WithTitle($"Received a DM message!")
+                    .WithDescription(message.Content)
+                    .WithCurrentTimestamp()
+                    .WithFields(new EmbedFieldBuilder().WithName("Username").WithValue(message.Author.Mention).WithIsInline(true))
+                    .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!").WithIconUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
+                    .WithColor(Discord.Color.Magenta);
+                
+                var dmComponents = new ComponentBuilder()
+                    .WithButton("Respond to DM", $"dm-respond-channel-{message.Channel.Id}", ButtonStyle.Success);
+
+                await dmChannel.SendMessageAsync(embed: dmEmbed.Build(), components: dmComponents.Build());
+
+                return;
+            }
+            
             // Only protocol message when it is part of a ticket
             await ProtocolMessageIfTicket(message);
         }
@@ -232,6 +271,40 @@ public class InteractionHandler
             await logschannel.SendMessageAsync($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
         
         _logger.LogInformation($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+    }
+
+    private async Task ModalSubmitted(SocketModal modal)
+    {
+        await modal.DeferAsync(ephemeral: true);
+        
+        if (modal.Data.CustomId.Contains("dm-respond-"))
+        {
+            _logger.LogDebug("Received a modal to respond to a dm.");
+
+            var words = modal.Data.CustomId.Split("-");
+
+            if (ulong.TryParse(words[2], out var channelId))
+            {
+                var channel = await _client.GetDMChannelAsync(channelId);
+
+                foreach (SocketMessageComponentData data in modal.Data.Components)
+                {
+                    await channel.SendMessageAsync(data.Value);
+
+                    var dmEmbed = new EmbedBuilder()
+                        .WithTitle("You have replied with:")
+                        .WithDescription(data.Value)
+                        .WithCurrentTimestamp()
+                        .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!").WithIconUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
+                        .WithColor(Discord.Color.Green);
+
+                    await modal.FollowupAsync(embed: dmEmbed.Build());
+                    return;
+                }
+            }
+        }
+
+        await modal.FollowupAsync("Something happened here. Either the channel is not accessible anymore or you just fucked up.");
     }
 
     /* ----------------------
@@ -549,5 +622,16 @@ public class InteractionHandler
                 return;
             }
         }
+    }
+
+    private async Task ShowModalForReplyDM(SocketMessageComponent component, string channelId)
+    {
+        var dmReplyModal = new ModalBuilder()
+            .WithTitle("Respond to DM")
+            .WithCustomId($"dm-respond-{channelId}")
+            .AddTextInput("Message", "message", TextInputStyle.Paragraph);
+
+        await component.RespondWithModalAsync(dmReplyModal.Build());
+        _logger.LogDebug("Modal sent.");
     }
 }

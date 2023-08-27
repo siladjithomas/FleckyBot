@@ -48,8 +48,6 @@
 /Users/thomas/Documents/Projects/FleckyBot/src/TelegramBot/obj/Debug/net6.0/TelegramBot.pdb
 /Users/thomas/Documents/Projects/FleckyBot/src/TelegramBot/obj/Debug/net6.0/TelegramBot.genruntimeconfig.cache
 /Users/thomas/Documents/Projects/FleckyBot/src/TelegramBot/obj/Debug/net6.0/ref/TelegramBot.dll
-/home/thomas/Projects/FleckyBot/src/TelegramBot/bin/Debug/net6.0/appsettings.Development.json
-/home/thomas/Projects/FleckyBot/src/TelegramBot/bin/Debug/net6.0/appsettings.json
 /home/thomas/Projects/FleckyBot/src/TelegramBot/bin/Debug/net6.0/TelegramBot
 /home/thomas/Projects/FleckyBot/src/TelegramBot/bin/Debug/net6.0/TelegramBot.deps.json
 /home/thomas/Projects/FleckyBot/src/TelegramBot/bin/Debug/net6.0/TelegramBot.runtimeconfig.json

@@ -35,7 +35,7 @@ public class BotStatus : IJob
         };
 
         Random rand = new Random();
-        int skipper = rand.Next(0, statuses.Count()-1);
+        int skipper = rand.Next(0, statuses.Count - 1);
 
         await _client.SetActivityAsync(new Game(statuses[skipper], ActivityType.Listening, ActivityProperties.None));
 
