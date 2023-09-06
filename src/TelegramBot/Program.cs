@@ -1,9 +1,18 @@
+using Telegram.Bot;
 using TelegramBot;
+using TelegramBot.Models;
+using TelegramBot.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
+    .ConfigureServices((hostContext, services) =>
     {
-        services.AddHostedService<Worker>();
+        var telegramBotSettings = hostContext.Configuration.GetSection("Telegram").Get<TelegramBotSettings>();
+        
+        // setting up telegram related stuff
+        services.AddSingleton(new TelegramBotClient(telegramBotSettings.AccessToken));
+		services.AddSingleton<TelegramInteractionHandler>();
+        
+        services.AddHostedService<TelegramWorker>();
     })
     .Build();
 

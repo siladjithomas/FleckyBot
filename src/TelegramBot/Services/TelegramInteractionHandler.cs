@@ -7,13 +7,13 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using Microsoft.CodeAnalysis.CSharp;
+using TelegramBot.Models;
 
-namespace Bot.Services;
+namespace TelegramBot.Services;
 
 public class TelegramInteractionHandler
 {
-	private readonly TelegramBotClient _client;
+    private readonly TelegramBotClient _client;
     private readonly ILogger<TelegramInteractionHandler> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
@@ -39,7 +39,7 @@ public class TelegramInteractionHandler
         );
 	}
 
-	private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         // Only process Message updates: https://core.telegram.org/bots/api#message
         if (update.Message is not { } message)

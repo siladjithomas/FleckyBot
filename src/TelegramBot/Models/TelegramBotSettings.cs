@@ -1,4 +1,4 @@
-namespace Bot.Models;
+namespace TelegramBot.Models;
 
 public class TelegramBotSettings
 {

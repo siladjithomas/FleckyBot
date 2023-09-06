@@ -50,18 +50,15 @@ public class InteractionHandler
 
     private async Task ReadyAsync()
     {
-#if DEBUG
-        _logger.LogInformation("In debug mode, adding commands to Guild with ID 799042503570358313...");
+        //_logger.LogInformation("In debug mode, adding commands to Guild with ID 799042503570358313...");
         // Flecky's Server
-        await _commands.RegisterCommandsToGuildAsync(799042503570358313);
+        //await _commands.RegisterCommandsToGuildAsync(799042503570358313);
         // Afterlife <3
-        await _commands.RegisterCommandsToGuildAsync(1114203792737579102);
-	// Garden of Even
-	await _commands.RegisterCommandsToGuildAsync(1010646571567816734);
-#else
+        //await _commands.RegisterCommandsToGuildAsync(1114203792737579102);
+	    // Garden of Even
+	    //await _commands.RegisterCommandsToGuildAsync(1010646571567816734);
         _logger.LogInformation("In production mode, adding commands globally...");
         await _commands.RegisterCommandsGloballyAsync(true);
-#endif
 
         _logger.LogInformation($"Logged in as {_client.CurrentUser}, shard id {_client.ShardId}");
 

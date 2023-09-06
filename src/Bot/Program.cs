@@ -8,9 +8,10 @@ using Discord.WebSocket;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Telegram.Bot;
 using Victoria;
 using Quartz;
+using TelegramBot;
+using TelegramBot.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureLogging((hostContext, logger) => 
@@ -22,7 +23,6 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
         var botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>();
-        var telegramBotSettings = hostContext.Configuration.GetSection("Telegram").Get<TelegramBotSettings>();
 
         services.AddSingleton(botSettings);
 
@@ -67,10 +67,6 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<InteractionHandler>();
 
-        // setting up telegram related stuff
-        services.AddSingleton(new TelegramBotClient(telegramBotSettings.AccessToken));
-		services.AddSingleton<TelegramInteractionHandler>();
-
         services.AddDbContext<ApplicationContext>(options => 
         {
             if (hostContext.Configuration.GetSection("ConnectionStrings").GetValue<string>("IsSqlite") == "True")
@@ -82,9 +78,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         services.AddHostedService<Worker>();
-        services.AddHostedService<TelegramWorker>();
 
-        services.AddScoped<RequestableRoleManager>();
+        // TODO: Set up so it uses the host settings from TelegramBot project
     })
     .UseSystemd()
     .Build();

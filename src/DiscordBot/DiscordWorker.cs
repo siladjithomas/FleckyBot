@@ -1,10 +1,10 @@
-namespace TelegramBot;
+namespace DiscordBot;
 
-public class Worker : BackgroundService
+public class DiscordWorker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<DiscordWorker> _logger;
 
-    public Worker(ILogger<Worker> logger)
+    public DiscordWorker(ILogger<DiscordWorker> logger)
     {
         _logger = logger;
     }
