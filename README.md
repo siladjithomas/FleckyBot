@@ -4,6 +4,8 @@
 
 *This is my personal bot that I am currently using to test out thing on the Discord platform. Written in C# on .Net 6.0. (originally on .Net 5.0) Running on my personal discord server.*
 
+***THIS BRANCH HAS BEEN DEPRECIATED AND IS ONLY HERE FOR ARCHIVING PURPOSES. PLEASE DO NOT USE!***
+
 ---
 
 Basically I am testing out many things that the Discord platform allows, including:
