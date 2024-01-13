@@ -6,6 +6,6 @@ public class BotSettings
     public string Prefix { get; set; } = "/";
     public int MessageCacheSize { get; set; }
     public bool AlwaysDownloadUsers { get; set; }
-    public bool CaseSensitiveComands { get; set; }
+    public bool CaseSensitiveCommands { get; set; }
     public bool UseMentionPrefix { get; set; }
 }

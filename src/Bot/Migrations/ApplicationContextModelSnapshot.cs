@@ -47,7 +47,7 @@ namespace Bot.Migrations
                     b.ToTable("BirthdayUser");
                 });
 
-            modelBuilder.Entity("Database.Models.Guild", b =>
+            modelBuilder.Entity("Database.Models.Guilds.Guild", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,7 +72,34 @@ namespace Bot.Migrations
                     b.ToTable("Guilds");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RoleId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<int>("RoleImportance")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("GuildRoles");
+                });
+
+            modelBuilder.Entity("Database.Models.Guilds.GuildRolesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -88,7 +115,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildRolesChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSignupChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildSignupChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -105,7 +132,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildSignupChannel");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildSystemMessagesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -121,7 +148,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildSystemMessagesChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -137,7 +164,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildTicketsChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildTicketsGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,7 +191,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildTicketsGroups");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildVotesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -9707,6 +9734,114 @@ namespace Bot.Migrations
                     b.ToTable("SignupCategory");
                 });
 
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallActiveChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SleepCallCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SleepCallCategoryId");
+
+                    b.ToTable("SleepCallActiveChannels");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CategoryId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("SleepCallCategorys");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("RoleId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SleepCallCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SleepCallCategoryId");
+
+                    b.ToTable("SleepCallGroups");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallIgnoredChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("SleepCallIgnoredChannels");
+                });
+
             modelBuilder.Entity("Database.Models.TelegramChat", b =>
                 {
                     b.Property<int>("Id")
@@ -9902,45 +10037,55 @@ namespace Bot.Migrations
                     b.ToTable("VoteUser");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildRole", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("GuildRoles")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Database.Models.Guilds.GuildRolesChannel", b =>
+                {
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildRolesChannel")
-                        .HasForeignKey("Database.Models.GuildRolesChannel", "Id");
+                        .HasForeignKey("Database.Models.Guilds.GuildRolesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSignupChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildSignupChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildSignupChannel")
-                        .HasForeignKey("Database.Models.GuildSignupChannel", "Id");
+                        .HasForeignKey("Database.Models.Guilds.GuildSignupChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildSystemMessagesChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildSystemMessagesChannel")
-                        .HasForeignKey("Database.Models.GuildSystemMessagesChannel", "Id");
+                        .HasForeignKey("Database.Models.Guilds.GuildSystemMessagesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildTicketsChannel")
-                        .HasForeignKey("Database.Models.GuildTicketsChannel", "Id");
+                        .HasForeignKey("Database.Models.Guilds.GuildTicketsChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildTicketsGroup", b =>
                 {
-                    b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
+                    b.HasOne("Database.Models.Guilds.GuildTicketsChannel", "GuildTicketsChannel")
                         .WithMany("GuildTicketsGroups")
                         .HasForeignKey("GuildTicketsChannelId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9948,11 +10093,11 @@ namespace Bot.Migrations
                     b.Navigation("GuildTicketsChannel");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildVotesChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildVotesChannel")
-                        .HasForeignKey("Database.Models.GuildVotesChannel", "Id");
+                        .HasForeignKey("Database.Models.Guilds.GuildVotesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
@@ -10002,6 +10147,46 @@ namespace Bot.Migrations
                     b.Navigation("Signup");
                 });
 
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallActiveChannel", b =>
+                {
+                    b.HasOne("Database.Models.SleepCalls.SleepCallCategory", "SleepCallCategory")
+                        .WithMany("SleepCallActiveChannels")
+                        .HasForeignKey("SleepCallCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SleepCallCategory");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("SleepCallCategories")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallGroup", b =>
+                {
+                    b.HasOne("Database.Models.SleepCalls.SleepCallCategory", "SleepCallCategory")
+                        .WithMany("SleepCallGroups")
+                        .HasForeignKey("SleepCallCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SleepCallCategory");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallIgnoredChannel", b =>
+                {
+                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("SleepCallIgnoredChannels")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("Database.Models.TelegramChat", b =>
                 {
                     b.HasOne("Database.Models.TelegramUser", "User")
@@ -10042,8 +10227,10 @@ namespace Bot.Migrations
                     b.Navigation("Vote");
                 });
 
-            modelBuilder.Entity("Database.Models.Guild", b =>
+            modelBuilder.Entity("Database.Models.Guilds.Guild", b =>
                 {
+                    b.Navigation("GuildRoles");
+
                     b.Navigation("GuildRolesChannel");
 
                     b.Navigation("GuildSignupChannel");
@@ -10053,9 +10240,13 @@ namespace Bot.Migrations
                     b.Navigation("GuildTicketsChannel");
 
                     b.Navigation("GuildVotesChannel");
+
+                    b.Navigation("SleepCallCategories");
+
+                    b.Navigation("SleepCallIgnoredChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
                     b.Navigation("GuildTicketsGroups");
                 });
@@ -10072,6 +10263,13 @@ namespace Bot.Migrations
             modelBuilder.Entity("Database.Models.SignupCategory", b =>
                 {
                     b.Navigation("Attendees");
+                });
+
+            modelBuilder.Entity("Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.Navigation("SleepCallActiveChannels");
+
+                    b.Navigation("SleepCallGroups");
                 });
 
             modelBuilder.Entity("Database.Models.TelegramChat", b =>

@@ -5,6 +5,8 @@
 
 # Do not upload Dev and Prod appsettings
 appsettings.*.json
+appsettings.*.*.json
+!appsettings.TelegramBot.json
 .vscode/
 
 # User-specific files

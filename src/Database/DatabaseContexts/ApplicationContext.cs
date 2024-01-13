@@ -1,4 +1,6 @@
 using Database.Models;
+using Database.Models.Guilds;
+using Database.Models.SleepCalls;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -18,6 +20,7 @@ public class ApplicationContext : DbContext
     public DbSet<GuildVotesChannel>? GuildVotesChannels { get; set; }
     public DbSet<GuildTicketsChannel>? GuildTicketsChannels { get; set; }
     public DbSet<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
+    public DbSet<GuildRole>? GuildRoles { get; set; }
     public DbSet<Quote>? Quote { get; set; }
     public DbSet<Vote>? Vote { get; set; }
     public DbSet<VoteUser>? VoteUser { get; set; }
@@ -38,34 +41,49 @@ public class ApplicationContext : DbContext
     // Birthday related tables
     public DbSet<BirthdayUser>? BirthdayUser { get; set; }
 
+    // Sleep Channels related tables
+    public DbSet<SleepCallCategory>? SleepCallCategorys { get; set; }
+    public DbSet<SleepCallGroup> SleepCallGroups { get; set; }
+    public DbSet<SleepCallActiveChannel> SleepCallActiveChannels { get; set; }
+    public DbSet<SleepCallIgnoredChannel> SleepCallIgnoredChannels { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Do stuff here
 
         modelBuilder.Entity<Guild>(entity => {
-            entity.HasOne<GuildRolesChannel>(t => t.GuildRolesChannel)
+            entity.HasOne(t => t.GuildRolesChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildRolesChannel>(t => t.Id)
                 .IsRequired(false);
 
-            entity.HasOne<GuildSystemMessagesChannel>(t => t.GuildSystemMessagesChannel)
+            entity.HasOne(t => t.GuildSystemMessagesChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildSystemMessagesChannel>(t => t.Id)
                 .IsRequired(false);
 
-            entity.HasOne<GuildTicketsChannel>(t => t.GuildTicketsChannel)
+            entity.HasOne(t => t.GuildTicketsChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildTicketsChannel>(t => t.Id)
                 .IsRequired(false);
 
-            entity.HasOne<GuildVotesChannel>(t => t.GuildVotesChannel)
+            entity.HasOne(t => t.GuildVotesChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildVotesChannel>(t => t.Id)
                 .IsRequired(false);
 
-            entity.HasOne<GuildSignupChannel>(t => t.GuildSignupChannel)
+            entity.HasOne(t => t.GuildSignupChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildSignupChannel>(t => t.Id)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<GuildRole>(entity =>
+        {
+            entity.HasOne(t => t.Guild)
+                .WithMany(t => t.GuildRoles)
+                .HasForeignKey(t => t.GuildId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });
 
@@ -125,6 +143,42 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<TelegramChat>(entity => {
             entity.HasOne(s => s.User)
                 .WithMany(s => s.Chats)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<SleepCallCategory>(entity =>
+        {
+            entity.HasOne(t => t.Guild)
+                .WithMany(t => t.SleepCallCategories)
+                .HasForeignKey(t => t.GuildId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<SleepCallIgnoredChannel>(entity =>
+        {
+            entity.HasOne(t => t.Guild)
+                .WithMany(t => t.SleepCallIgnoredChannels)
+                .HasForeignKey(t => t.GuildId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<SleepCallGroup>(entity =>
+        {
+            entity.HasOne(t => t.SleepCallCategory)
+                .WithMany(t => t.SleepCallGroups)
+                .HasForeignKey(t => t.SleepCallCategoryId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<SleepCallActiveChannel>(entity =>
+        {
+            entity.HasOne(t => t.SleepCallCategory)
+                .WithMany(t => t.SleepCallActiveChannels)
+                .HasForeignKey(t => t.SleepCallCategoryId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         });

@@ -7,13 +7,19 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Victoria;
 using Quartz;
-using TelegramBot;
-using TelegramBot.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureHostConfiguration((hostContext) =>
+    {
+        hostContext.Sources.Clear();
+        hostContext.AddJsonFile("appsettings.Development.json");
+        hostContext.AddJsonFile("appsettings.BotConfig.json");
+    })
     .ConfigureLogging((hostContext, logger) => 
     {
         logger.AddSerilog(new LoggerConfiguration()
@@ -21,9 +27,9 @@ IHost host = Host.CreateDefaultBuilder(args)
             .CreateLogger());
     })
     .ConfigureServices((hostContext, services) =>
-    {
+    {   
         var botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>();
-
+        
         services.AddSingleton(botSettings);
 
         var discordSocketConfig = new DiscordSocketConfig
@@ -39,7 +45,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 #endif
         };
 
-        services.AddLavaNode(x => 
+        services.AddLavaNode(x =>
         {
             x.SelfDeaf = true;
             x.Port = 2333;
@@ -51,7 +57,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             q.UseMicrosoftDependencyInjectionJobFactory();
 
-            q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
+            //q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
             //q.AddJobAndTrigger<CheckDMMessages>(hostContext.Configuration);
         });
 
@@ -65,6 +71,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
+        // TODO: Properly implement the mail service for vrchat 2fa code
+        services.AddSingleton<MailService>();
         services.AddSingleton<InteractionHandler>();
 
         services.AddDbContext<ApplicationContext>(options => 

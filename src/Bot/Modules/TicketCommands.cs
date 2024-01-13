@@ -7,6 +7,7 @@ using Database.DatabaseContexts;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Database.Models.Guilds;
 
 namespace Bot.Modules;
 

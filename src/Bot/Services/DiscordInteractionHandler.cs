@@ -4,11 +4,6 @@ using Discord.WebSocket;
 using Bot.Models;
 using Database.DatabaseContexts;
 using Database.Models;
-using Telegram.Bot;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Victoria;
 using Victoria.Node;
 using Victoria.Node.EventArgs;
@@ -17,6 +12,11 @@ using Victoria.Responses.Search;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Reflection.Emit;
+using Database.Models.Guilds;
+using Database.Models.SleepCalls;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using System;
+using System.Data;
 
 namespace Bot.Services;
 
@@ -26,13 +26,15 @@ public class InteractionHandler
     private readonly InteractionService _commands;
     private readonly ILogger<Worker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly MailService _mailService;
 
-    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
+    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger, IServiceScopeFactory scopeFactory, MailService mailService)
     {
         _client = client;
         _commands = commands;
         _logger = logger;
         _scopeFactory = scopeFactory;
+        _mailService = mailService;
 
         _client.Ready += ReadyAsync;
         _client.SelectMenuExecuted += SelectMenuExectuted;
@@ -46,6 +48,7 @@ public class InteractionHandler
         _client.RoleDeleted += RoleDeleted;
         _client.RoleUpdated += RoleChange;
         _client.ModalSubmitted += ModalSubmitted;
+        _client.UserVoiceStateUpdated += UserVoiceStateUpdatedAsync;
     }
 
     private async Task ReadyAsync()
@@ -55,8 +58,10 @@ public class InteractionHandler
         //await _commands.RegisterCommandsToGuildAsync(799042503570358313);
         // Afterlife <3
         //await _commands.RegisterCommandsToGuildAsync(1114203792737579102);
-	    // Garden of Even
-	    //await _commands.RegisterCommandsToGuildAsync(1010646571567816734);
+        // Garden of Even
+        //await _commands.RegisterCommandsToGuildAsync(1010646571567816734);
+        // Katsch & Tratsch
+        //await _commands.RegisterCommandsToGuildAsync(1195582611075113041);
         _logger.LogInformation("In production mode, adding commands globally...");
         await _commands.RegisterCommandsGloballyAsync(true);
 
@@ -66,6 +71,61 @@ public class InteractionHandler
         await _client.SetStatusAsync(UserStatus.AFK);
 
         _logger.LogInformation($"Status of {_client.CurrentUser} on shard id {_client.ShardId} has been set properly");
+
+        //TODO: just for testing, get mail from mail service
+        await _mailService.GetMail();
+    }
+
+    private async Task UserVoiceStateUpdatedAsync(SocketUser user, SocketVoiceState state1, SocketVoiceState state2)
+    {
+        _logger.LogDebug("User is entering voice...");
+
+        if (user is SocketGuildUser guildUser)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            if (state1.VoiceChannel != null && state2.VoiceChannel == null)
+            {
+                _logger.LogDebug("{user} just left voice channel {voiceChannelName}.", user.Username, state1.VoiceChannel.Name);
+
+                var sleepyCategory1 = GetSleepyCategoryIfValid(context, state1.VoiceChannel);
+                _logger.LogDebug("{user} is sleepy? {isSleepy1}", guildUser.Username, sleepyCategory1);
+
+                if (sleepyCategory1 != null)
+                {
+                    await CheckAndDeleteSleepyChannel(context, guildUser, state1);
+                }
+            }
+            else if (state1.VoiceChannel == null && state2.VoiceChannel != null)
+            {
+                _logger.LogDebug("{user} just joined voice channel {voiceChannelName}.", user.Username, state2.VoiceChannel.Name);
+
+                var sleepyCategory2 = GetSleepyCategoryIfValid(context, state2.VoiceChannel);
+                _logger.LogDebug("{user} is sleepy? {isSleepy2}", guildUser.Username, sleepyCategory2);
+
+                if (sleepyCategory2 != null)
+                {
+                    await CheckAndCreateSleepyChannel(context, guildUser, state2);
+                }
+            }
+            else if (state1.VoiceChannel != null && state2.VoiceChannel != null)
+            {
+                _logger.LogDebug("{user} just switched from {voiceChannelNameOld} to {voiceChannelNameNew}", user.Username, state1.VoiceChannel.Name, state2.VoiceChannel.Name);
+
+                var sleepyCategory1 = GetSleepyCategoryIfValid(context, state1.VoiceChannel);
+                var sleepyCategory2 = GetSleepyCategoryIfValid(context, state2.VoiceChannel);
+                _logger.LogDebug("{user} is sleepy? State 1: {isSleepy1} | State 2: {isSleepy2}", guildUser.Username, sleepyCategory1, sleepyCategory2);
+
+                if (sleepyCategory1 != null)
+                    await CheckAndDeleteSleepyChannel(context, guildUser, state1);
+
+                if (sleepyCategory2 != null)
+                    await CheckAndCreateSleepyChannel(context, guildUser, state2);
+            }
+        }
+
+        await Task.CompletedTask;
     }
 
     private async Task SelectMenuExectuted(SocketMessageComponent component)
@@ -140,6 +200,13 @@ public class InteractionHandler
     {
         if (!message.Author.IsBot)
         {
+            if (message.Author is SocketGuildUser guildUser)
+            {
+                _logger.LogDebug("User {guildUser} in guild {guildName} has sent a message.", guildUser, guildUser.Guild.Name);
+                _logger.LogDebug("Content of message: {messageContent}", message.Content);
+                _logger.LogDebug("Count of attachments: {messagePicturesCount}", message.Attachments.Count());
+            }
+
             if (message.Channel is SocketDMChannel)
             {
                 _logger.LogInformation("Received a message from a DM!");
@@ -172,102 +239,124 @@ public class InteractionHandler
 
     private async Task UserBanned(SocketUser user, SocketGuild guild)
     {
-        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
-        
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been banned.");
-        
-        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been banned.");
+        if (guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been banned.");
+
+            _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been banned.");
+        }   
     }
 
     private async Task UserUnbanned(SocketUser user, SocketGuild guild)
     {
-        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
-        
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been unbanned.");
-        
-        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been unbanned.");
-    }
+        if (guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
 
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been unbanned.");
+
+            _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been unbanned.");
+        }
+    }
     private async Task UserJoined(SocketGuildUser guildUser)
     {
-        SocketTextChannel? logsChannel = guildUser.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
-        SocketTextChannel? welcomeChannel = guildUser.Guild.GetChannel(946996188970905610) as SocketTextChannel;
-        
-        if (welcomeChannel != null)
+        _logger.LogInformation("User {user} joined the guild {guildName}.", guildUser.Username, guildUser.Guild.Name);
+
+        if (guildUser.Guild.Id == 799042503570358313)
         {
-            var embed = new EmbedBuilder()
-            .WithTitle($"Welcome to the Server, {guildUser}!")
-            .WithDescription("Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
-            .WithCurrentTimestamp()
-            .WithColor(Discord.Color.Magenta)
-            .WithFooter(new EmbedFooterBuilder()
-                .WithText("Executed by FleckyBot#3339")
-                .WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
-            .WithThumbnailUrl(guildUser.GetAvatarUrl())
-            .WithImageUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG");
-        
-            await welcomeChannel.SendMessageAsync(embed: embed.Build());
+            SocketTextChannel? logsChannel = guildUser.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+            SocketTextChannel? welcomeChannel = guildUser.Guild.GetChannel(946996188970905610) as SocketTextChannel;
+
+            if (welcomeChannel != null)
+            {
+                var embed = new EmbedBuilder()
+                .WithTitle($"Welcome to the Server, {guildUser}!")
+                .WithDescription("Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
+                .WithCurrentTimestamp()
+                .WithColor(Discord.Color.Magenta)
+                .WithFooter(new EmbedFooterBuilder()
+                    .WithText("Executed by FleckyBot#3339")
+                    .WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
+                .WithThumbnailUrl(guildUser.GetAvatarUrl())
+                .WithImageUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG");
+
+                await welcomeChannel.SendMessageAsync(embed: embed.Build());
+            }
+
+            if (logsChannel != null)
+                await logsChannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+
+            _logger.LogInformation($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+
+            var defaultRoles = new List<ulong>
+            {
+                969545947799506954
+            };
+
+            await guildUser.AddRolesAsync(defaultRoles);
+
+            _logger.LogInformation($"Added role \"Unverified\" to user {guildUser}.");
         }
-
-        if (logsChannel != null)
-            await logsChannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
-        
-        _logger.LogInformation($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
-
-        var defaultRoles = new List<ulong>
-        {
-            969545947799506954
-        };
-
-        await guildUser.AddRolesAsync(defaultRoles);
-
-        _logger.LogInformation($"Added role \"Unverified\" to user {guildUser}.");
     }
 
     private async Task UserLeft(SocketGuild guild, SocketUser user)
     {
-        SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
-        SocketTextChannel? goodbyeChannel = guild.GetChannel(946996188970905610) as SocketTextChannel;
+        if (guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = guild.GetChannel(1065032230407245905) as SocketTextChannel;
+            SocketTextChannel? goodbyeChannel = guild.GetChannel(946996188970905610) as SocketTextChannel;
 
-        if (goodbyeChannel != null)
-            await goodbyeChannel.SendMessageAsync($"**{user}** just left the guild. Adieu!");
+            if (goodbyeChannel != null)
+                await goodbyeChannel.SendMessageAsync($"**{user}** just left the guild. Adieu!");
 
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
-        
-        _logger.LogInformation($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+
+            _logger.LogInformation($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+        }
     }
 
     private async Task RoleChange(SocketRole role1, SocketRole role2)
     {
-        SocketTextChannel? logschannel = role1.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        if (role2.Guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = role1.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
 
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
-        
-        _logger.LogInformation($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+
+            _logger.LogInformation($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+        }
     }
 
     private async Task RoleCreated(SocketRole role)
     {
-        SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        if (role.Guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
 
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"Role {role.Name} has been created in guild {role.Guild.Name}.");
-        
-        _logger.LogInformation($"Role {role.Name} has been created in guild {role.Guild.Name}.");
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"Role {role.Name} has been created in guild {role.Guild.Name}.");
+
+            _logger.LogInformation($"Role {role.Name} has been created in guild {role.Guild.Name}.");
+        }
     }
 
     private async Task RoleDeleted(SocketRole role)
     {
-        SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
+        if (role.Guild.Id == 799042503570358313)
+        {
+            SocketTextChannel? logschannel = role.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
 
-        if (logschannel != null)
-            await logschannel.SendMessageAsync($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
-        
-        _logger.LogInformation($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+            if (logschannel != null)
+                await logschannel.SendMessageAsync($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+
+            _logger.LogInformation($"Role {role.Name} has been deleted in guild {role.Guild.Name}.");
+        }
     }
 
     private async Task ModalSubmitted(SocketModal modal)
@@ -307,6 +396,108 @@ public class InteractionHandler
     /* ----------------------
         private functions
     ---------------------- */
+
+    private SocketVoiceChannel? GetSleepyCategoryIfValid(ApplicationContext context, SocketVoiceChannel? sleepyVoiceChannel)
+    {
+        if (sleepyVoiceChannel == null) return null;
+
+        var guild = context.Guilds?
+            .FirstOrDefault(x => x.GuildId == sleepyVoiceChannel.Guild.Id);
+
+        if (guild == null) return null;
+
+        var ignoredChannel = context.SleepCallIgnoredChannels?
+            .FirstOrDefault(x => x.Guild == guild && x.ChannelId == sleepyVoiceChannel.Id);
+
+        if (ignoredChannel != null) return null;
+
+        var sleepCategory = context.SleepCallCategorys?
+            .FirstOrDefault(x => x.Guild == guild && x.CategoryId == sleepyVoiceChannel.Category.Id);
+
+        return sleepCategory == null ? null : sleepyVoiceChannel;
+    }
+
+    private async Task CheckAndDeleteSleepyChannel(ApplicationContext context, SocketGuildUser guildUser, SocketVoiceState state1)
+    {
+        var guild = context.Guilds?
+            .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
+
+        if (state1.VoiceChannel.ConnectedUsers.Count == 0)
+        {
+            if (guild != null)
+            {
+                var category = context.SleepCallCategorys?.Where(x => x.Guild == guild && x.CategoryId == state1.VoiceChannel.CategoryId).FirstOrDefault();
+
+                if (category != null)
+                {
+                    var channelToDelete = context.SleepCallActiveChannels.FirstOrDefault(x => x.SleepCallCategory == category && x.ChannelId == state1.VoiceChannel.Id);
+
+                    if (channelToDelete != null)
+                    {
+                        await state1.VoiceChannel.DeleteAsync();
+
+                        context.Remove(channelToDelete);
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task CheckAndCreateSleepyChannel(ApplicationContext context, SocketGuildUser guildUser, SocketVoiceState state2)
+    {
+        var guild = context.Guilds?
+                .FirstOrDefault(x => x.GuildId == state2.VoiceChannel.Guild.Id);
+
+        if (guild != null)
+        {
+            var category = context.SleepCallCategorys?.Where(x => x.Guild == guild && x.CategoryId == state2.VoiceChannel.CategoryId).FirstOrDefault();
+
+            if (category != null)
+            {
+                var isInPossibleGroup = context.SleepCallGroups.FirstOrDefault(x => x.SleepCallCategory == category);
+
+                if (isInPossibleGroup == null)
+                {
+                    _logger.LogWarning("{user} is not in any group.", guildUser.Username);
+                    await guildUser.ModifyAsync(x => x.Channel = null);
+                    return;
+                }
+                else if (!guildUser.Roles.Contains(state2.VoiceChannel.Guild.GetRole(isInPossibleGroup.RoleId)))
+                {
+                    _logger.LogWarning("{user} is not in any group.", guildUser.Username);
+                    await guildUser.ModifyAsync(x => x.Channel = null);
+                    return;
+                }
+
+                var voiceChannel = context.SleepCallActiveChannels.FirstOrDefault(x => x.ChannelId == state2.VoiceChannel.Id && x.SleepCallCategory == category);
+
+                if (voiceChannel == null)
+                {
+                    var newSleepyChannel = await state2.VoiceChannel.Guild.CreateVoiceChannelAsync($"{guildUser.Username}'s Sleepy Channel", x => { x.CategoryId = category.CategoryId; });
+
+                    await newSleepyChannel.SyncPermissionsAsync();
+                    await newSleepyChannel.AddPermissionOverwriteAsync(guildUser, OverwritePermissions.InheritAll.Modify(
+                        manageChannel: PermValue.Allow
+                    ));
+
+                    var newActiveChannel = new SleepCallActiveChannel
+                    {
+                        ChannelId = newSleepyChannel.Id,
+                        ChannelName = newSleepyChannel.Name,
+                        SleepCallCategory = category
+                    };
+
+                    await context.SleepCallActiveChannels.AddAsync(newActiveChannel);
+
+                    await context.SaveChangesAsync();
+
+                    await guildUser.ModifyAsync(x => x.Channel = newSleepyChannel);
+                }
+            }
+        }
+    }
 
     private async Task RulesAcceptedSetRights(SocketMessageComponent component)
     {
