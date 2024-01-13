@@ -14,7 +14,6 @@ using System.Linq;
 using System.Reflection.Emit;
 using Database.Models.Guilds;
 using Database.Models.SleepCalls;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using System;
 using System.Data;
 
