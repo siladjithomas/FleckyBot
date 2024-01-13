@@ -85,6 +85,11 @@ IHost host = Host.CreateDefaultBuilder(args)
             //options.EnableSensitiveDataLogging(true);
         });
 
+        services.AddDbContext<DbContext>(options => 
+        {
+            options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+        });
+
         services.AddHostedService<Worker>();
 
         // TODO: Set up so it uses the host settings from TelegramBot project
