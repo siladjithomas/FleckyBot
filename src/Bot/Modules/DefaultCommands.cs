@@ -15,13 +15,15 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     private readonly CommandHandler _handler;
     private readonly ILogger<Worker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly MailService _mailService;
 
-    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
+    public DefaultCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, IServiceScopeFactory scopeFactory, MailService mailService)
     {
         commands = service;
         _handler = handler;
         _logger = logger;
         _scopeFactory = scopeFactory;
+        _mailService = mailService;
     }
 
     [SlashCommand("random", "Get a random number!")]
@@ -169,5 +171,12 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
                 await FollowupAsync("Role already exists in database.");
             }
         }
+    }
+
+    [RequireOwner]
+    [SlashCommand("getmail", "Get mail")]
+    public async Task GetMail()
+    {
+        await RespondAsync("Wrote messages in log.", ephemeral: true);
     }
 }
