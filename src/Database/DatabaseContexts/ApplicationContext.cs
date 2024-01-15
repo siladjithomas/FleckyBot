@@ -17,6 +17,7 @@ public class ApplicationContext : DbContext
     public DbSet<Guild>? Guilds { get; set; }
     public DbSet<GuildSystemMessagesChannel>? GuildSystemMessagesChannels { get; set; }
     public DbSet<GuildRolesChannel>? GuildRolesChannels { get; set; }
+    public DbSet<GuildRuleChannel>? GuildRuleChannels { get; set; }
     public DbSet<GuildVotesChannel>? GuildVotesChannels { get; set; }
     public DbSet<GuildTicketsChannel>? GuildTicketsChannels { get; set; }
     public DbSet<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
@@ -76,6 +77,11 @@ public class ApplicationContext : DbContext
             entity.HasOne(t => t.GuildSignupChannel)
                 .WithOne(r => r.Guild)
                 .HasForeignKey<GuildSignupChannel>(t => t.Id)
+                .IsRequired(false);
+
+            entity.HasOne(t => t.GuildRuleChannel)
+                .WithOne(r => r.Guild)
+                .HasForeignKey<GuildRuleChannel>(t => t.Id)
                 .IsRequired(false);
         });
 

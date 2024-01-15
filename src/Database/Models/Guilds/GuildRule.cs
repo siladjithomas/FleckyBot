@@ -8,7 +8,7 @@ namespace Database.Models.Guilds
         public int Id { get; set; }
         public string? RuleText { get; set; }
         [MaxLength(2)]
-        public char? RuleLanguage { get; set; }
+        public string? RuleLanguage { get; set; }
 
         public int GuildId { get; set; }
         public Guild? Guild { get; set; }

@@ -17,6 +17,7 @@ public class Guild
     public GuildVotesChannel? GuildVotesChannel { get; set; }
     public GuildTicketsChannel? GuildTicketsChannel { get; set; }
     public GuildSignupChannel? GuildSignupChannel { get; set; }
+    public GuildRuleChannel? GuildRuleChannel { get; set; }
 
     public List<GuildRole>? ImportantGuildRoles { get; set; }
     public List<GuildRule>? GuildRules { get; set; }

@@ -93,18 +93,5 @@ namespace Bot.Modules
                 }
             }
         }
-
-        [SlashCommand("rulesadd", "Add a accept rules button to a specific channel")]
-        public async Task AddRules(SocketTextChannel rulesChannel)
-        {
-            await DeferAsync(ephemeral: true);
-            
-            var ruleAcceptButton = new ComponentBuilder()
-                .WithButton("Regeln akzeptieren", "accept-rules", ButtonStyle.Success);
-
-            await rulesChannel.SendMessageAsync("Wenn du die Regeln akzeptierst dann klicke hier auf den Button.", components: ruleAcceptButton.Build());
-
-            await FollowupAsync($"Added rules to channel {rulesChannel.Mention}");
-        }
     }
 }

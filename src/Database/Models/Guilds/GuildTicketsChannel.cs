@@ -2,14 +2,8 @@
 
 namespace Database.Models.Guilds
 {
-    public class GuildTicketsChannel
+    public class GuildTicketsChannel : GuildChannel
     {
-        [ForeignKey("Guild")]
-        public int Id { get; set; }
-        public ulong ChannelId { get; set; }
-        public string? ChannelName { get; set; }
-
         public List<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
-        public Guild? Guild { get; set; }
     }
 }
