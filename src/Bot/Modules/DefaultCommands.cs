@@ -134,18 +134,18 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
 
     [RequireOwner]
     [SlashCommand("rolesadd", "Add a role that a new user should receive")]
-    public async Task AddDefaultGuildRole(SocketRole guildSocketRole)
+    public async Task AddDefaultGuildRole(SocketRole guildSocketRole, [Choice("Verified", "verified"), Choice("Unverified", "unverified")]string description)
     {
         await DeferAsync(ephemeral: true);
 
         using var scope = _scopeFactory.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-        var guild = context.Guilds?.Include(x => x.GuildRoles).FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+        var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
         if (guild != null)
         {
-            var guildRole = context.GuildRoles?.FirstOrDefault(x => x.Guild == guild && x.RoleId == guildSocketRole.Id);
+            var guildRole = context.ImportantGuildRoles?.FirstOrDefault(x => x.Guild == guild && x.RoleId == guildSocketRole.Id);
 
             if (guildRole == null)
             {
@@ -154,13 +154,13 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
                     Guild = guild,
                     RoleId = guildSocketRole.Id,
                     RoleName = guildSocketRole.Name,
-                    RoleImportance = 0
+                    RoleDescription = description
                 };
 
-                if (guild.GuildRoles == null)
-                    guild.GuildRoles = new List<GuildRole> { newGuildRole };
+                if (guild.ImportantGuildRoles == null)
+                    guild.ImportantGuildRoles = new List<GuildRole> { newGuildRole };
                 else
-                    guild.GuildRoles.Add(newGuildRole);
+                    guild.ImportantGuildRoles.Add(newGuildRole);
 
                 await context.SaveChangesAsync();
 

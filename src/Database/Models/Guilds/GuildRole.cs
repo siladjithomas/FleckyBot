@@ -8,11 +8,11 @@ namespace Database.Models.Guilds
         public int Id { get; set; }
         public ulong RoleId { get; set; }
         public string? RoleName { get; set; }
-        // Role Importance Reminder:
-        // 0 -> member
-        // 1 -> ?
-        // 2 -> ?
-        public int RoleImportance { get; set; }
+        // "verified" -> for use when a user gets verified
+        // "unverified" -> for use when a user joins the guild and is not verified
+        // "mod" -> a mod role
+        // "admin" -> a admin role
+        public string? RoleDescription { get; set; }
 
 
         public int GuildId { get; set; }
