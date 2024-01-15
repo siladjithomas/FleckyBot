@@ -21,6 +21,7 @@ public class ApplicationContext : DbContext
     public DbSet<GuildTicketsChannel>? GuildTicketsChannels { get; set; }
     public DbSet<GuildTicketsGroup>? GuildTicketsGroups { get; set; }
     public DbSet<GuildRole>? ImportantGuildRoles { get; set; }
+    public DbSet<GuildRule>? GuildRules { get; set; }
     public DbSet<Quote>? Quote { get; set; }
     public DbSet<Vote>? Vote { get; set; }
     public DbSet<VoteUser>? VoteUser { get; set; }
@@ -82,6 +83,15 @@ public class ApplicationContext : DbContext
         {
             entity.HasOne(t => t.Guild)
                 .WithMany(t => t.ImportantGuildRoles)
+                .HasForeignKey(t => t.GuildId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+        });
+
+        modelBuilder.Entity<GuildRule>(entity => 
+        { 
+            entity.HasOne(t => t.Guild)
+                .WithMany(t => t.GuildRules)
                 .HasForeignKey(t => t.GuildId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);

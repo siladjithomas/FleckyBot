@@ -19,6 +19,7 @@ public class Guild
     public GuildSignupChannel? GuildSignupChannel { get; set; }
 
     public List<GuildRole>? ImportantGuildRoles { get; set; }
+    public List<GuildRule>? GuildRules { get; set; }
 
     public List<SleepCallCategory>? SleepCallCategories { get; set; }
     public List<SleepCallIgnoredChannel>? SleepCallIgnoredChannels { get; set; }
