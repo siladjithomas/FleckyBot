@@ -1,11 +1,9 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot;
 using Bot.Services;
 using Database.DatabaseContexts;
 using Database.Models.Guilds;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bot.Modules;
 
@@ -130,47 +128,6 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             .WithCurrentTimestamp();
 
         await FollowupAsync(embed: embed.Build());
-    }
-
-    [RequireOwner]
-    [SlashCommand("rolesadd", "Add a role that a new user should receive")]
-    public async Task AddDefaultGuildRole(SocketRole guildSocketRole, [Choice("Verified", "verified"), Choice("Unverified", "unverified")]string description)
-    {
-        await DeferAsync(ephemeral: true);
-
-        using var scope = _scopeFactory.CreateScope();
-        using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-
-        var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == Context.Guild.Id);
-
-        if (guild != null)
-        {
-            var guildRole = context.ImportantGuildRoles?.FirstOrDefault(x => x.Guild == guild && x.RoleId == guildSocketRole.Id);
-
-            if (guildRole == null)
-            {
-                var newGuildRole = new GuildRole
-                {
-                    Guild = guild,
-                    RoleId = guildSocketRole.Id,
-                    RoleName = guildSocketRole.Name,
-                    RoleDescription = description
-                };
-
-                if (guild.ImportantGuildRoles == null)
-                    guild.ImportantGuildRoles = new List<GuildRole> { newGuildRole };
-                else
-                    guild.ImportantGuildRoles.Add(newGuildRole);
-
-                await context.SaveChangesAsync();
-
-                await FollowupAsync("Added role to starter role.");
-            }
-            else
-            {
-                await FollowupAsync("Role already exists in database.");
-            }
-        }
     }
 
     [RequireOwner]

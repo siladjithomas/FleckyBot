@@ -129,7 +129,7 @@ public class InteractionHandler
         await component.DeferAsync();
 
         var values = String.Join(", ", component.Data.Values);
-        _logger.LogDebug($"Select menu command has been executed, custom id {component.Data.CustomId}, values {values}");
+        _logger.LogDebug("Select menu command has been executed, custom id {customId}, values {values}", component.Data.CustomId, values);
 
         switch (component.Data.CustomId)
         {
@@ -140,7 +140,7 @@ public class InteractionHandler
                 await TicketSetRights(component);
                 break;
             default:
-                _logger.LogInformation($"Ah snap! I can't do anything with custom id {component.Data.CustomId}!");
+                _logger.LogInformation("Ah snap! I can't do anything with custom id {customId}!", component.Data.CustomId);
                 break;
         }
 
@@ -149,7 +149,7 @@ public class InteractionHandler
 
     private async Task ButtonExecuted(SocketMessageComponent component)
     {
-        _logger.LogDebug($"Button command has been executed, custom id {component.Data.CustomId}, value {component.Data.Value}");
+        _logger.LogDebug("Button command has been executed, custom id {customId}, value {value}", component.Data.CustomId, component.Data.Value);
 
         // regarding DMs, because there is no way to send a custom value with an custom id, at least not with a button,
         // I check if the custom ID contains a specific value and get it's channel id from it
@@ -296,6 +296,30 @@ public class InteractionHandler
             await guildUser.AddRolesAsync(defaultRoles);
 
             _logger.LogInformation($"Added role \"Unverified\" to user {guildUser}.");
+        }
+        else
+        {
+            using var scope = _scopeFactory.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(g => g.GuildId == guildUser.Guild.Id);
+
+            if (guild != null && guild.ImportantGuildRoles != null)
+            {
+                var guildRole = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "unverified");
+
+                if (guildRole != null)
+                {
+                    var defaultRoles = new List<ulong>
+                    {
+                        guildRole.RoleId
+                    };
+
+                    await guildUser.AddRolesAsync(defaultRoles);
+
+                    _logger.LogInformation("Added role {role} to user {guildUser}.", guildRole.RoleName, guildUser);
+                }
+            }
         }
     }
 
@@ -497,25 +521,59 @@ public class InteractionHandler
 
     private async Task RulesAcceptedSetRights(SocketMessageComponent component)
     {
-        var rulesRemove = new List<ulong>
+        if (component.GuildId == 799042503570358313)
         {
-            969545947799506954
-        };
+            var rulesRemove = new List<ulong>
+            {
+                969545947799506954
+            };
 
-        var rulesAdd = new List<ulong>
+            var rulesAdd = new List<ulong>
+            {
+                936572438140043284,
+                968996826986471434,
+                969008169227538462
+            };
+
+            SocketGuildUser guildUser = (SocketGuildUser)component.User;
+            await guildUser.RemoveRolesAsync(rulesRemove);
+            await guildUser.AddRolesAsync(rulesAdd);
+
+            _logger.LogInformation($"User {guildUser} has accepted the rules on guild.");
+
+            await component.FollowupAsync("Rules have been accepted. Have fun on the server!", ephemeral: true);
+        }
+        else
         {
-            936572438140043284,
-            968996826986471434,
-            969008169227538462
-        };
+            using var scope = _scopeFactory.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-        SocketGuildUser guildUser = (SocketGuildUser)component.User;
-        await guildUser.RemoveRolesAsync(rulesRemove);
-        await guildUser.AddRolesAsync(rulesAdd);
+            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == component.GuildId);
 
-        _logger.LogInformation($"User {guildUser} has accepted the rules on guild.");
+            if (guild != null && guild.ImportantGuildRoles != null)
+            {
+                GuildRole unverified = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "unverified") ?? throw new Exception("Unverified role not found in database.");
+                GuildRole verified = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "verified") ?? throw new Exception("Unverified role not found in database.");
 
-        await component.FollowupAsync("Rules have been accepted. Have fun on the server!", ephemeral: true);
+                var rulesRemove = new List<ulong>
+                {
+                    unverified.RoleId
+                };
+
+                var rulesAdd = new List<ulong>
+                {
+                    verified.RoleId
+                };
+
+                SocketGuildUser guildUser = (SocketGuildUser)component.User;
+                await guildUser.RemoveRolesAsync(rulesRemove);
+                await guildUser.AddRolesAsync(rulesAdd);
+
+                _logger.LogInformation($"User {guildUser} has accepted the rules on guild.");
+
+                await component.FollowupAsync("Rules have been accepted. Have fun on the server!", ephemeral: true);
+            }
+        }
     }
     
     private async Task ProtocolMessageIfTicket(SocketMessage message)
