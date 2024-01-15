@@ -70,9 +70,6 @@ public class InteractionHandler
         await _client.SetStatusAsync(UserStatus.AFK);
 
         _logger.LogInformation($"Status of {_client.CurrentUser} on shard id {_client.ShardId} has been set properly");
-
-        //TODO: just for testing, get mail from mail service
-        await _mailService.GetMail();
     }
 
     private async Task UserVoiceStateUpdatedAsync(SocketUser user, SocketVoiceState state1, SocketVoiceState state2)

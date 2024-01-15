@@ -177,6 +177,10 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     [SlashCommand("getmail", "Get mail")]
     public async Task GetMail()
     {
-        await RespondAsync("Wrote messages in log.", ephemeral: true);
+        await DeferAsync(ephemeral: true);
+        
+        await _mailService.GetMail();
+        
+        await FollowupAsync("Wrote messages in log.");
     }
 }

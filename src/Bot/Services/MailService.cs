@@ -4,16 +4,19 @@ using MailKit;
 using MailKit.Search;
 using MailKit.Net.Imap;
 using Serilog;
+using Bot.Models;
 
 namespace Bot.Services;
 
 public class MailService
 {
     private readonly ILogger<Worker> _logger;
+    private readonly MailSettings _settings;
 
-    public MailService(ILogger<Worker> logger)
+    public MailService(ILogger<Worker> logger, MailSettings settings)
     {
         _logger = logger;
+        _settings = settings;
 
         _logger.LogInformation("Set up Mail service...");
     }
@@ -22,8 +25,8 @@ public class MailService
     {
         using var client = new ImapClient();
 
-        await client.ConnectAsync("tsuyabashi-dev.netcup-mail.de", 993, true);
-        await client.AuthenticateAsync("nexus@tsuyabashi.dev", "NetCafeNexus2023");
+        await client.ConnectAsync(_settings.ImapHost, _settings.ImapPort, _settings.ImapUseSsl);
+        await client.AuthenticateAsync(_settings.ImapUsername, _settings.ImapPassword);
 
         var inbox = client.Inbox;
         await inbox.OpenAsync(FolderAccess.ReadOnly);

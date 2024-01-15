@@ -27,10 +27,12 @@ IHost host = Host.CreateDefaultBuilder(args)
             .CreateLogger());
     })
     .ConfigureServices((hostContext, services) =>
-    {   
-        var botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>();
+    {
+        BotSettings botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>() ?? throw new KeyNotFoundException("Bot Settings in config file not found.");
+        MailSettings mailSettings = hostContext.Configuration.GetSection(nameof(MailSettings)).Get<MailSettings>() ?? throw new KeyNotFoundException("Mail Settings in config file not found.");
         
         services.AddSingleton(botSettings);
+        services.AddSingleton(mailSettings);
 
         var discordSocketConfig = new DiscordSocketConfig
         {
@@ -77,10 +79,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddDbContext<ApplicationContext>(options => 
         {
-            if (hostContext.Configuration.GetSection("ConnectionStrings").GetValue<string>("IsSqlite") == "True")
-                options.UseSqlite(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
-            else
-                options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+            options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
             
             //options.EnableSensitiveDataLogging(true);
         });
