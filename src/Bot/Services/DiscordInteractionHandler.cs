@@ -184,8 +184,11 @@ public class InteractionHandler
             case "close-ticket":
                 await CloseTicket(component);
                 break;
+            case "create-ticket":
+                await CreateTicketButton(component);
+                break;
             default:
-                _logger.LogInformation($"Ah snap. I can't do anything with custom id {component.Data.CustomId}!");
+                _logger.LogInformation("Ah snap. I can't do anything with custom id {customId}!", component.Data.CustomId);
                 break;
         }
 
@@ -581,7 +584,7 @@ public class InteractionHandler
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-            Ticket? ticket = context.Ticket.Where(x => x.ChannelId == message.Channel.Id).Include(y => y.TicketMessages).FirstOrDefault();
+            Ticket? ticket = context.Ticket?.Where(x => x.ChannelId == message.Channel.Id).Include(y => y.TicketMessages).FirstOrDefault();
 
             if (ticket == null)
                 return;
@@ -625,7 +628,7 @@ public class InteractionHandler
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            guild = context.Guilds.Where(x => x.GuildId == component.GuildId).FirstOrDefault();
+            guild = context.Guilds?.Where(x => x.GuildId == component.GuildId).FirstOrDefault();
         }
 
         if (guild != null)
@@ -725,7 +728,7 @@ public class InteractionHandler
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Vote? vote = context.Vote.Where(x => x.MessageId == component.Message.Id)
+            Vote? vote = context.Vote?.Where(x => x.MessageId == component.Message.Id)
                 .Include(y => y.VoteByUser)
                 .FirstOrDefault();
 
@@ -863,6 +866,79 @@ public class InteractionHandler
                 _logger.LogError($"I was not able to find a ticket with the id {component.Message.Id} in the database. Aborting....");
                 return;
             }
+        }
+    }
+
+    private async Task CreateTicketButton(SocketMessageComponent messageComponent)
+    {
+        var channelName = $"ticket-{messageComponent.User.Username}";
+        SocketGuildUser guildUser = messageComponent.User as SocketGuildUser ?? throw new Exception();
+
+        using var scope = _scopeFactory.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+        Guild? guild = context.Guilds?.Where(x => x.GuildId == guildUser.Guild.Id)
+            .Include(y => y.GuildTicketsChannel)
+            .ThenInclude(z => z.GuildTicketsGroups)
+            .FirstOrDefault();
+
+        if (guild != null)
+        {
+            var guildTicket = await guildUser.Guild.CreateTextChannelAsync(channelName, x => {
+                x.CategoryId = guild.GuildTicketsChannel?.ChannelId;
+                x.Topic = $"This ticket has been created in behalf of {guildUser.Username}";
+            });
+
+            await guildTicket.SyncPermissionsAsync();
+            await guildTicket.AddPermissionOverwriteAsync(messageComponent.User, OverwritePermissions.DenyAll(guildTicket).Modify(
+                sendMessages: PermValue.Allow,
+                addReactions: PermValue.Allow,
+                embedLinks: PermValue.Allow,
+                readMessageHistory: PermValue.Allow,
+                viewChannel: PermValue.Allow,
+                attachFiles: PermValue.Allow
+            ));
+
+            context.Ticket?.Add(new Ticket
+            {
+                UserId = messageComponent.User.Id,
+                UserName = $"{messageComponent.User}",
+                ChannelId = guildTicket.Id,
+                ChannelName = channelName,
+                IsOpen = true,
+                TimestampCreated = DateTime.Now
+            });
+
+            await context.SaveChangesAsync();
+
+            await messageComponent.FollowupAsync($"Ticket {guildTicket.Mention} has been created.", allowedMentions: AllowedMentions.All);
+
+            var menu = new SelectMenuBuilder()
+                .WithPlaceholder("Select an option")
+                .WithCustomId("menu-ticket-category")
+                .WithMinValues(1)
+                .WithMaxValues(1);
+
+            if (guild.GuildTicketsChannel?.GuildTicketsGroups != null)
+                foreach (GuildTicketsGroup group in guild.GuildTicketsChannel.GuildTicketsGroups)
+                {
+                    menu.AddOption($"Talk with {group.GroupName}", $"menu-ticket-category-{group.GroupType}", $"Choose this if you want to talk with {group.GroupName}");
+                    var groupRole = guildUser.Guild.GetRole(group.GroupId);
+                    await guildTicket.AddPermissionOverwriteAsync(groupRole, OverwritePermissions.DenyAll(guildTicket));
+                }
+
+            var component = new ComponentBuilder()
+                .WithSelectMenu(menu);
+
+            await guildTicket.SendMessageAsync("Ticket has been created! Please choose an option to get this ticket to the right group.", components: component.Build());
+
+            _logger.LogInformation("Ticket with the name {name} ({id}) has been created.", guildTicket.Name, guildTicket.Id);
+        }
+        else
+        {
+            _logger.LogWarning($"Guild is not set up. Cannot create ticket. Aborting....");
+            await messageComponent.FollowupAsync("This guild has not been set up for the ticket system. Please use the `/setup` command to set it up.");
+            return;
         }
     }
 

@@ -41,7 +41,7 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id).Include(s => s.GuildTicketsChannel).ThenInclude(z => z.GuildTicketsGroups).FirstOrDefault();
+            Guild? guild = context.Guilds?.Where(x => x.GuildId == Context.Guild.Id).Include(s => s.GuildTicketsChannel).ThenInclude(z => z.GuildTicketsGroups).FirstOrDefault();
 
             if (guild != null)
             {
@@ -80,21 +80,21 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
             {
                 if (guild.GuildTicketsChannel.GuildTicketsGroups == null)
                 {
-                    guild.GuildTicketsChannel.GuildTicketsGroups = new List<GuildTicketsGroup>();
-
-                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
-                    {
-                        GroupId = adminRole.Id,
-                        GroupName = adminRole.Name,
-                        GroupType = "admin"
-                    });
-
-                    guild.GuildTicketsChannel.GuildTicketsGroups.Add(new GuildTicketsGroup
-                    {
-                        GroupId = modRole.Id,
-                        GroupName = modRole.Name,
-                        GroupType = "mod"
-                    });
+                    guild.GuildTicketsChannel.GuildTicketsGroups =
+                    [
+                        new GuildTicketsGroup
+                        {
+                            GroupId = adminRole.Id,
+                            GroupName = adminRole.Name,
+                            GroupType = "admin"
+                        },
+                        new GuildTicketsGroup
+                        {
+                            GroupId = modRole.Id,
+                            GroupName = modRole.Name,
+                            GroupType = "mod"
+                        },
+                    ];
 
                     await context.SaveChangesAsync();
 
@@ -145,7 +145,7 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-            Guild? guild = context.Guilds.Where(x => x.GuildId == Context.Guild.Id)
+            Guild? guild = context.Guilds?.Where(x => x.GuildId == Context.Guild.Id)
                 .Include(y => y.GuildTicketsChannel)
                 .ThenInclude(z => z.GuildTicketsGroups)
                 .FirstOrDefault();
@@ -168,10 +168,10 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
                         attachFiles: PermValue.Allow
                     ));
 
-                    context.Ticket.Add(new Ticket
+                    context.Ticket?.Add(new Ticket
                     {
                         UserId = Context.User.Id,
-                        UserName = $"{Context.User.ToString()}",
+                        UserName = $"{Context.User}",
                         ChannelId = guildTicket.Id,
                         ChannelName = channelName,
                         IsOpen = true,
@@ -201,11 +201,11 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
                     
                     await guildTicket.SendMessageAsync("Ticket has been created! Please choose an option to get this ticket to the right group.", components: component.Build());
 
-                    _logger.LogInformation($"Ticket with the name {guildTicket.Name} ({guildTicket.Id}) has been created.");
+                    _logger.LogInformation("Ticket with the name {name} ({id}) has been created.", guildTicket.Name, guildTicket.Id);
                 }
                 else
                 {
-                    _logger.LogWarning($"User {Context.User} tried to create a voice channel ticket. Not implemented for now. Aborting....");
+                    _logger.LogWarning("User {user} tried to create a voice channel ticket. Not implemented for now. Aborting....", Context.User);
                     await FollowupAsync("Currently not implemented. Please create a text channel for now.");
                     return;
                 }
@@ -215,6 +215,36 @@ public class TicketCommands : InteractionModuleBase<SocketInteractionContext>
                 await FollowupAsync("This guild has not been set up for the ticket system. Please use the `/setup` command to set it up.");
                 return;
             }
+        }
+    }
+
+    [SlashCommand("post", "Post the ticket button to a channel")]
+    public async Task PostRules(SocketTextChannel ticketsChannel)
+    {
+        await DeferAsync(ephemeral: true);
+
+        using var scope = _scopeFactory.CreateScope();
+        using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+        var guild = context.Guilds?.FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+
+        if (guild != null)
+        {
+            var ruleEmbed = new EmbedBuilder()
+                .WithTitle("Ticket erstellen")
+                .WithDescription("Klicke auf dem Button um ein Ticket zu erstellen.")
+                .WithColor(Color.DarkBlue);
+
+            var ruleAcceptButton = new ComponentBuilder()
+                .WithButton("Ticket erstellen", "create-ticket", ButtonStyle.Primary);
+
+            var ruleMessage = await ticketsChannel.SendMessageAsync(embed: ruleEmbed.Build(), components: ruleAcceptButton.Build());
+
+            await FollowupAsync($"Added ticket creator to channel {ticketsChannel.Mention}");
+        }
+        else
+        {
+            await FollowupAsync("Guild not found in database.");
         }
     }
 }
