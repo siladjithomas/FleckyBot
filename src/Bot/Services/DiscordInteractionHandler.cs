@@ -911,7 +911,7 @@ public class InteractionHandler
 
             await context.SaveChangesAsync();
 
-            await messageComponent.FollowupAsync($"Ticket {guildTicket.Mention} has been created.", allowedMentions: AllowedMentions.All);
+            await messageComponent.FollowupAsync($"Ticket {guildTicket.Mention} has been created.", allowedMentions: AllowedMentions.All, ephemeral: true);
 
             var menu = new SelectMenuBuilder()
                 .WithPlaceholder("Select an option")
