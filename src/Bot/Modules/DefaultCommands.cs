@@ -128,7 +128,7 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
         };
 
         Random rand = new Random();
-        int skipper = rand.Next(1, fleckyPictures.Count);
+        int skipper = rand.Next(0, fleckyPictures.Count-1);
 
         var embed = new EmbedBuilder()
             .WithAuthor(Context.User)
