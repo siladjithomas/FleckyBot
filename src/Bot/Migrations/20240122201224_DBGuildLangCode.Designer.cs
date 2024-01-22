@@ -4,6 +4,7 @@ using Database.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240122201224_DBGuildLangCode")]
+    partial class DBGuildLangCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,58 +239,6 @@ namespace Bot.Migrations
                     b.HasIndex("GuildTicketsChannelId");
 
                     b.ToTable("GuildTicketsGroups");
-                });
-
-            modelBuilder.Entity("Database.Models.Guilds.GuildTimetableChannel", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ChannelId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<string>("ChannelName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("RequestAppointmentMessageId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<decimal>("TimetableListMessageId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GuildTimetableChannel");
-                });
-
-            modelBuilder.Entity("Database.Models.Guilds.GuildTimetableLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("GuildId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("RequestedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("RequestingUserId")
-                        .HasColumnType("decimal(20,0)");
-
-                    b.Property<string>("RequestingUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GuildId");
-
-                    b.ToTable("GuildTimetableLines");
                 });
 
             modelBuilder.Entity("Database.Models.Guilds.GuildVotesChannel", b =>
@@ -10211,25 +10162,6 @@ namespace Bot.Migrations
                     b.Navigation("GuildTicketsChannel");
                 });
 
-            modelBuilder.Entity("Database.Models.Guilds.GuildTimetableChannel", b =>
-                {
-                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
-                        .WithOne("GuildTimetableChannel")
-                        .HasForeignKey("Database.Models.Guilds.GuildTimetableChannel", "Id");
-
-                    b.Navigation("Guild");
-                });
-
-            modelBuilder.Entity("Database.Models.Guilds.GuildTimetableLine", b =>
-                {
-                    b.HasOne("Database.Models.Guilds.Guild", "Guild")
-                        .WithMany("GuildTimetableLines")
-                        .HasForeignKey("GuildId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Guild");
-                });
-
             modelBuilder.Entity("Database.Models.Guilds.GuildVotesChannel", b =>
                 {
                     b.HasOne("Database.Models.Guilds.Guild", "Guild")
@@ -10377,10 +10309,6 @@ namespace Bot.Migrations
                     b.Navigation("GuildSystemMessagesChannel");
 
                     b.Navigation("GuildTicketsChannel");
-
-                    b.Navigation("GuildTimetableChannel");
-
-                    b.Navigation("GuildTimetableLines");
 
                     b.Navigation("GuildVotesChannel");
 

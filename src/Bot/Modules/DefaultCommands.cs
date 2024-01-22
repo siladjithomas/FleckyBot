@@ -74,7 +74,7 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     [SlashCommand("setup", "Setup the guild in the database")]
-    public async Task SetupGuild()
+    public async Task SetupGuild([Choice("English", "en"), Choice("Deutsch", "de")]string langCode)
     {
         await DeferAsync(ephemeral: true);
 
@@ -84,19 +84,19 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Guild? guild = context.Guilds.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
+            Guild? guild = context.Guilds?.Where(g => g.GuildId == Context.Guild.Id).FirstOrDefault();
 
             if (guild == null)
             {   
                 SocketTextChannel? channel = Context.Channel as SocketTextChannel;
-                int count = context.Guilds.Count() + 1;
 
-                context.Guilds.Add(new Guild
+                context.Guilds?.Add(new Guild
                 {
                     GuildId = Context.Guild.Id,
                     GuildName = Context.Guild.Name,
                     GuildAdminId = Context.Guild.OwnerId,
-                    GuildAdminName = @$"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}"
+                    GuildAdminName = @$"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}",
+                    GuildLanguageCode = langCode
                 });
 
                 await context.SaveChangesAsync();
@@ -108,8 +108,15 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
             }
             else
             {
-                await FollowupAsync("Guild has been already set up. Skipping...");
-                return;
+                guild.GuildId = Context.Guild.Id;
+                guild.GuildName = Context.Guild.Name;
+                guild.GuildAdminId = Context.Guild.OwnerId;
+                guild.GuildAdminName = @$"{Context.Guild.Owner.Nickname}#{Context.Guild.Owner.Discriminator}";
+                guild.GuildLanguageCode = langCode;
+
+                await context.SaveChangesAsync();
+
+                await FollowupAsync("Updated Guild info.");
             }
         }
     }
