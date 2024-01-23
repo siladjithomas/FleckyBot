@@ -44,16 +44,24 @@ namespace Bot.Modules
                 var timetableListMessage = await channel.SendMessageAsync("Timetable currently not available. Please check later.");
                 var requestAppointmentMessage = await channel.SendMessageAsync("Requests currently not available. Please check later.");
 
-                var newChannel = new GuildTimetableChannel
+                if (guild.GuildTimetableChannel == null)
                 {
-                    Guild = guild,
-                    ChannelId = channel.Id,
-                    ChannelName = channel.Name,
-                    RequestAppointmentMessageId = requestAppointmentMessage.Id,
-                    TimetableListMessageId = timetableListMessage.Id
-                };
-
-                guild.GuildTimetableChannel = newChannel;
+                    guild.GuildTimetableChannel = new GuildTimetableChannel
+                    {
+                        Guild = guild,
+                        ChannelId = channel.Id,
+                        ChannelName = channel.Name,
+                        RequestAppointmentMessageId = requestAppointmentMessage.Id,
+                        TimetableListMessageId = timetableListMessage.Id
+                    };
+                }
+                else
+                {
+                    guild.GuildTimetableChannel.ChannelId = channel.Id;
+                    guild.GuildTimetableChannel.ChannelName = channel.Name;
+                    guild.GuildTimetableChannel.RequestAppointmentMessageId = requestAppointmentMessage.Id;
+                    guild.GuildTimetableChannel.TimetableListMessageId = timetableListMessage.Id;
+                }
 
                 await context.SaveChangesAsync();
 
