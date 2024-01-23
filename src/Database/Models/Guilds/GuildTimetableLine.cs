@@ -15,6 +15,7 @@ namespace Database.Models.Guilds
         public string? RequestingUserName { get; set; }
         public DateTime? RequestedTime { get; set; }
         public bool IsApproved { get; set; } = false;
+        public bool IsDone { get; set; } = false;
 
         public int GuildId { get; set; }
         public Guild? Guild { get; set; }
