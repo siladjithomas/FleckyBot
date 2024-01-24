@@ -37,12 +37,34 @@ namespace Bot.Modules
 
             var guild = context.Guilds?
                 .Include(x => x.GuildTimetableChannel)
+                .Include(x => x.GuildTimetableLines)
                 .FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
             if (guild != null)
             {
-                var timetableListMessage = await channel.SendMessageAsync("Timetable currently not available. Please check later.");
-                var requestAppointmentMessage = await channel.SendMessageAsync("Requests currently not available. Please check later.");
+                var embedTimetableList = new EmbedBuilder()
+                    .WithTitle("Derzeitige Termine")
+                    .WithDescription("Hier werden die derzeitigen Termine angezeigt.\n\nMögliche Termine:\n- Mo-Fr 20-23 Uhr\n- Sa-So 14-23 Uhr")
+                    .WithColor(Color.DarkPurple)
+                    .WithCurrentTimestamp();
+                var embedAppointment = new EmbedBuilder()
+                    .WithTitle("Terminvergabe")
+                    .WithDescription("Bitte klicke auf dem Button um einen Termin auszumachen.")
+                    .WithColor(Color.Purple);
+                var buttonAppointment = new ComponentBuilder()
+                    .WithButton("Termin ausmachen", "appointment-create", ButtonStyle.Success);
+
+                if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
+                    foreach (var line in guild.GuildTimetableLines)
+                        if (line.RequestedTime.HasValue)
+                        {
+                            var accepted = line.IsApproved ? "✔" : "✖";
+                            
+                            embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})");
+                        }
+                
+                var timetableListMessage = await channel.SendMessageAsync(embed: embedTimetableList.Build());
+                var requestAppointmentMessage = await channel.SendMessageAsync(embed: embedAppointment.Build(), components: buttonAppointment.Build());
 
                 if (guild.GuildTimetableChannel == null)
                 {
