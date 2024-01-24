@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Bot.Models;
@@ -157,7 +157,7 @@ public class InteractionHandler
         {
             _logger.LogDebug("DM will be responded, please wait...");
             var words = component.Data.CustomId.Split("-");
-            
+
             var channelId = words[3];
             _logger.LogDebug($"Channel ID: {channelId}");
 
@@ -165,34 +165,39 @@ public class InteractionHandler
             return;
         }
 
-        await component.DeferAsync(ephemeral: true);
-
         switch (component.Data.CustomId)
         {
             case "accept-rules":
+                await component.DeferAsync(ephemeral: true);
                 await RulesAcceptedSetRights(component);
                 break;
             case "vote-yes":
+                await component.DeferAsync(ephemeral: true);
                 await AddChoiceToVote(component, true);
                 break;
             case "vote-no":
+                await component.DeferAsync(ephemeral: true);
                 await AddChoiceToVote(component, false);
                 break;
             case "vote-close":
+                await component.DeferAsync(ephemeral: true);
                 await CloseVote(component);
                 break;
             case "close-ticket":
+                await component.DeferAsync(ephemeral: true);
                 await CloseTicket(component);
                 break;
             case "create-ticket":
+                await component.DeferAsync(ephemeral: true);
                 await CreateTicketButton(component);
+                break;
+            case "appointment-create":
+                await CreateModalForAppointment(component);
                 break;
             default:
                 _logger.LogInformation("Ah snap. I can't do anything with custom id {customId}!", component.Data.CustomId);
                 break;
         }
-
-        await component.FollowupAsync();
     }
 
     public async Task MessageReceived(SocketMessage message)
@@ -409,6 +414,66 @@ public class InteractionHandler
 
                     await modal.FollowupAsync(embed: dmEmbed.Build());
                     return;
+                }
+            }
+        }
+        else if (modal.Data.CustomId == "appointment-create")
+        {
+            _logger.LogDebug("Received a modal to create an appointment.");
+
+            if (modal.User is SocketGuildUser guildUser)
+            {
+                await using var scope = _scopeFactory.CreateAsyncScope();
+                await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+                var guild = context.Guilds?
+                    .Include(x => x.GuildTimetableLines)
+                    .Include(x => x.GuildTimetableChannel)
+                    .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
+
+                if (guild != null && guild.GuildTimetableChannel != null)
+                {
+                    foreach (SocketMessageComponentData data in modal.Data.Components)
+                    {
+                        var newLine = new GuildTimetableLine
+                        {
+                            Guild = guild,
+                            RequestedTime = DateTime.Parse(data.Value),
+                            RequestingUserId = guildUser.Id,
+                            RequestingUserName = guildUser.Username
+                        };
+
+                        if (guild.GuildTimetableLines == null)
+                            guild.GuildTimetableLines = new List<GuildTimetableLine>() { newLine };
+                        else
+                            guild.GuildTimetableLines.Add(newLine);
+
+                        await context.SaveChangesAsync();
+
+                        await modal.FollowupAsync("Der Termin wurde soeben hinzugefügt.");
+
+                        var embedTimetableList = new EmbedBuilder()
+                            .WithTitle("Derzeitige Termine")
+                            .WithDescription("Hier werden die derzeitigen Termine angezeigt.\n\nMögliche Termine:\n- Mo-Fr 20-23 Uhr\n- Sa-So 14-23 Uhr")
+                            .WithColor(Color.DarkPurple)
+                            .WithCurrentTimestamp();
+
+                        if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
+                            foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
+                                if (line.RequestedTime.HasValue)
+                                {
+                                    var accepted = line.IsApproved ? "✔" : "✖";
+
+                                    embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})", true);
+                                }
+
+                        var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
+
+                        await textChannel.ModifyMessageAsync(guild.GuildTimetableChannel.TimetableListMessageId, x =>
+                        {
+                            x.Embed = embedTimetableList.Build();
+                        });
+                    }
                 }
             }
         }
@@ -951,5 +1016,15 @@ public class InteractionHandler
 
         await component.RespondWithModalAsync(dmReplyModal.Build());
         _logger.LogDebug("Modal sent.");
+    }
+
+    private async Task CreateModalForAppointment(SocketMessageComponent component)
+    {
+        var modal = new ModalBuilder()
+            .WithCustomId("appointment-create")
+            .WithTitle("Termin ausmachen")
+            .AddTextInput("", "appointment-create-datetime", TextInputStyle.Short, DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true, value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
+
+        await component.RespondWithModalAsync(modal.Build());
     }
 }
