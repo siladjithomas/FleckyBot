@@ -1023,7 +1023,7 @@ public class InteractionHandler
         var modal = new ModalBuilder()
             .WithCustomId("appointment-create")
             .WithTitle("Termin ausmachen")
-            .AddTextInput("", "appointment-create-datetime", TextInputStyle.Short, DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true, value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
+            .AddTextInput("Gewünschter Termin", "appointment-create-datetime", TextInputStyle.Short, DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true, value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
 
         await component.RespondWithModalAsync(modal.Build());
     }
