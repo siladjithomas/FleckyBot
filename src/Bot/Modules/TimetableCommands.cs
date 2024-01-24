@@ -38,7 +38,7 @@ namespace Bot.Modules
             var guild = context.Guilds?
                 .Include(x => x.GuildTimetableChannel)
                 .Include(x => x.GuildTimetableLines)
-                .FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+                .FirstOrDefault(x => x.GuildId == Context.Guild.Id); 
 
             if (guild != null)
             {
@@ -55,12 +55,12 @@ namespace Bot.Modules
                     .WithButton("Termin ausmachen", "appointment-create", ButtonStyle.Success);
 
                 if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
-                    foreach (var line in guild.GuildTimetableLines)
+                    foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
                         if (line.RequestedTime.HasValue)
                         {
                             var accepted = line.IsApproved ? "✔" : "✖";
                             
-                            embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})");
+                            embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})", true);
                         }
                 
                 var timetableListMessage = await channel.SendMessageAsync(embed: embedTimetableList.Build());
