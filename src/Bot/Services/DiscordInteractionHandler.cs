@@ -148,6 +148,9 @@ public class InteractionHandler
             case "appointment-delete":
                 await AppointmentDelete(component);
                 break;
+            case "appointment-approve":
+                await AppointmentApprove(component);
+                break;
             default:
                 _logger.LogInformation("Ah snap! I can't do anything with custom id {customId}!",
                     component.Data.CustomId);
@@ -1126,6 +1129,50 @@ public class InteractionHandler
         }
     }
 
+    private async Task AppointmentApprove(SocketMessageComponent component)
+    {
+        if (component.User is SocketGuildUser guildUser)
+        {
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            var guild = context.Guilds?
+                .Include(x => x.GuildTimetableLines)
+                .Include(x => x.GuildTimetableChannel)
+                .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
+
+            if (guild != null && guild.GuildTimetableLines != null && guild.GuildTimetableChannel != null)
+            {
+                foreach (var value in component.Data.Values)
+                {
+                    _logger.LogDebug("Got value {rawId} from component.", value);
+
+                    var id = int.Parse(value);
+
+                    _logger.LogDebug("Appointment with ID {appointmentId} successfully parsed.", id);
+
+                    var lineToApprove = context.GuildTimetableLines?
+                        .FirstOrDefault(x => x.Id == id);
+
+                    if (lineToApprove != null)
+                    {
+                        _logger.LogDebug("Found line with ID {lineToDeleteId}. Time to approve!", lineToApprove.Id);
+
+                        lineToApprove.IsApproved = true;
+                        context.GuildTimetableLines?.Update(lineToApprove);
+
+                        await context.SaveChangesAsync();
+
+                        await component.FollowupAsync("Termin wurde soeben akzeptiert.", ephemeral: true);
+                        await component.DeleteOriginalResponseAsync();
+
+                        await ResendTimetableList(guild, guildUser);
+                    }
+                }
+            }
+        }
+    }
+
     private async Task ResendTimetableList(Guild guild, SocketGuildUser guildUser)
     {
         if (guild.GuildTimetableChannel != null)
@@ -1142,7 +1189,7 @@ public class InteractionHandler
                     {
                         var accepted = line.IsApproved ? "✔" : "✖";
 
-                        embedTimetableList.AddField(line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
+                        embedTimetableList.AddField(line.RequestedTime.Value.ToString("dddd, dd MMMM yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
                     }
 
             var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);

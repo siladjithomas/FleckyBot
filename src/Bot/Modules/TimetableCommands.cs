@@ -217,5 +217,38 @@ namespace Bot.Modules
 
             await FollowupAsync("");
         }
+
+        [RequireRole(1199324451335061554)]
+        [SlashCommand("approve", "Approve an appointment")]
+        public async Task ApproveAppointemnt()
+        {
+            await DeferAsync(ephemeral: true);
+
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            var guild = context.Guilds?
+                .Include(x => x.GuildTimetableChannel)
+                .Include(x => x.GuildTimetableLines)
+                .FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+
+            if (guild != null && guild.GuildTimetableChannel != null && guild.GuildTimetableLines != null)
+            {
+                var approveAppointmentSelect = new SelectMenuBuilder()
+                    .WithCustomId("appointment-approve");
+
+                foreach (GuildTimetableLine line in guild.GuildTimetableLines)
+                    approveAppointmentSelect.AddOption($"{line.RequestedTime} from {line.RequestingUserName}",
+                        $"{line.Id}");
+
+                var components = new ComponentBuilder()
+                    .WithSelectMenu(approveAppointmentSelect);
+
+                await FollowupAsync("Welchen Termin willst du akzeptieren?", components: components.Build());
+                return;
+            }
+
+            await FollowupAsync("");
+        }
     }
 }
