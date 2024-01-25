@@ -450,7 +450,7 @@ public class InteractionHandler
 
                         await context.SaveChangesAsync();
 
-                        await modal.FollowupAsync("Der Termin wurde soeben hinzugefügt.");
+                        await modal.FollowupAsync("Der Termin wurde soeben hinzugefügt.", ephemeral: true);
 
                         var embedTimetableList = new EmbedBuilder()
                             .WithTitle("Derzeitige Termine")
@@ -473,12 +473,12 @@ public class InteractionHandler
                         {
                             x.Embed = embedTimetableList.Build();
                         });
+
+                        return;
                     }
                 }
             }
         }
-
-        await modal.FollowupAsync("Something happened here. Either the channel is not accessible anymore or you just fucked up.");
     }
 
     /* ----------------------
