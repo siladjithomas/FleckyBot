@@ -237,7 +237,7 @@ namespace Bot.Modules
                 var approveAppointmentSelect = new SelectMenuBuilder()
                     .WithCustomId("appointment-approve");
 
-                foreach (GuildTimetableLine line in guild.GuildTimetableLines)
+                foreach (GuildTimetableLine line in guild.GuildTimetableLines.FindAll(x => x.IsApproved == false))
                     approveAppointmentSelect.AddOption($"{line.RequestedTime} from {line.RequestingUserName}",
                         $"{line.Id}");
 

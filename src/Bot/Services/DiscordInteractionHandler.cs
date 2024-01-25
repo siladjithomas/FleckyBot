@@ -1184,6 +1184,7 @@ public class InteractionHandler
                 .WithCurrentTimestamp();
 
             if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
+            {
                 foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
                     if (line.RequestedTime.HasValue)
                     {
@@ -1191,6 +1192,11 @@ public class InteractionHandler
 
                         embedTimetableList.AddField(line.RequestedTime.Value.ToString("dddd, dd MMMM yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
                     }
+            }
+            else
+            {
+                embedTimetableList.Description += "\n\n***Derzeit sind keine Termine vergeben.***";
+            }
 
             var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
 
