@@ -27,7 +27,8 @@ public class InteractionHandler
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly MailService _mailService;
 
-    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger, IServiceScopeFactory scopeFactory, MailService mailService)
+    public InteractionHandler(DiscordSocketClient client, InteractionService commands, ILogger<Worker> logger,
+        IServiceScopeFactory scopeFactory, MailService mailService)
     {
         _client = client;
         _commands = commands;
@@ -83,7 +84,8 @@ public class InteractionHandler
 
             if (state1.VoiceChannel != null && state2.VoiceChannel == null)
             {
-                _logger.LogDebug("{user} just left voice channel {voiceChannelName}.", user.Username, state1.VoiceChannel.Name);
+                _logger.LogDebug("{user} just left voice channel {voiceChannelName}.", user.Username,
+                    state1.VoiceChannel.Name);
 
                 var sleepyCategory1 = GetSleepyCategoryIfValid(context, state1.VoiceChannel);
                 _logger.LogDebug("{user} is sleepy? {isSleepy1}", guildUser.Username, sleepyCategory1);
@@ -95,7 +97,8 @@ public class InteractionHandler
             }
             else if (state1.VoiceChannel == null && state2.VoiceChannel != null)
             {
-                _logger.LogDebug("{user} just joined voice channel {voiceChannelName}.", user.Username, state2.VoiceChannel.Name);
+                _logger.LogDebug("{user} just joined voice channel {voiceChannelName}.", user.Username,
+                    state2.VoiceChannel.Name);
 
                 var sleepyCategory2 = GetSleepyCategoryIfValid(context, state2.VoiceChannel);
                 _logger.LogDebug("{user} is sleepy? {isSleepy2}", guildUser.Username, sleepyCategory2);
@@ -107,11 +110,13 @@ public class InteractionHandler
             }
             else if (state1.VoiceChannel != null && state2.VoiceChannel != null)
             {
-                _logger.LogDebug("{user} just switched from {voiceChannelNameOld} to {voiceChannelNameNew}", user.Username, state1.VoiceChannel.Name, state2.VoiceChannel.Name);
+                _logger.LogDebug("{user} just switched from {voiceChannelNameOld} to {voiceChannelNameNew}",
+                    user.Username, state1.VoiceChannel.Name, state2.VoiceChannel.Name);
 
                 var sleepyCategory1 = GetSleepyCategoryIfValid(context, state1.VoiceChannel);
                 var sleepyCategory2 = GetSleepyCategoryIfValid(context, state2.VoiceChannel);
-                _logger.LogDebug("{user} is sleepy? State 1: {isSleepy1} | State 2: {isSleepy2}", guildUser.Username, sleepyCategory1, sleepyCategory2);
+                _logger.LogDebug("{user} is sleepy? State 1: {isSleepy1} | State 2: {isSleepy2}", guildUser.Username,
+                    sleepyCategory1, sleepyCategory2);
 
                 if (sleepyCategory1 != null)
                     await CheckAndDeleteSleepyChannel(context, guildUser, state1);
@@ -129,7 +134,8 @@ public class InteractionHandler
         await component.DeferAsync();
 
         var values = String.Join(", ", component.Data.Values);
-        _logger.LogDebug("Select menu command has been executed, custom id {customId}, values {values}", component.Data.CustomId, values);
+        _logger.LogDebug("Select menu command has been executed, custom id {customId}, values {values}",
+            component.Data.CustomId, values);
 
         switch (component.Data.CustomId)
         {
@@ -143,7 +149,8 @@ public class InteractionHandler
                 await AppointmentDelete(component);
                 break;
             default:
-                _logger.LogInformation("Ah snap! I can't do anything with custom id {customId}!", component.Data.CustomId);
+                _logger.LogInformation("Ah snap! I can't do anything with custom id {customId}!",
+                    component.Data.CustomId);
                 break;
         }
 
@@ -152,7 +159,8 @@ public class InteractionHandler
 
     private async Task ButtonExecuted(SocketMessageComponent component)
     {
-        _logger.LogDebug("Button command has been executed, custom id {customId}, value {value}", component.Data.CustomId, component.Data.Value);
+        _logger.LogDebug("Button command has been executed, custom id {customId}, value {value}",
+            component.Data.CustomId, component.Data.Value);
 
         // regarding DMs, because there is no way to send a custom value with an custom id, at least not with a button,
         // I check if the custom ID contains a specific value and get it's channel id from it
@@ -198,7 +206,8 @@ public class InteractionHandler
                 await CreateModalForAppointment(component);
                 break;
             default:
-                _logger.LogInformation("Ah snap. I can't do anything with custom id {customId}!", component.Data.CustomId);
+                _logger.LogInformation("Ah snap. I can't do anything with custom id {customId}!",
+                    component.Data.CustomId);
                 break;
         }
     }
@@ -209,7 +218,8 @@ public class InteractionHandler
         {
             if (message.Author is SocketGuildUser guildUser)
             {
-                _logger.LogDebug("User {guildUser} in guild {guildName} has sent a message.", guildUser, guildUser.Guild.Name);
+                _logger.LogDebug("User {guildUser} in guild {guildName} has sent a message.", guildUser,
+                    guildUser.Guild.Name);
                 _logger.LogDebug("Content of message: {messageContent}", message.Content);
                 _logger.LogDebug("Count of attachments: {messagePicturesCount}", message.Attachments.Count());
             }
@@ -225,10 +235,12 @@ public class InteractionHandler
                     .WithTitle($"Received a DM message!")
                     .WithDescription(message.Content)
                     .WithCurrentTimestamp()
-                    .WithFields(new EmbedFieldBuilder().WithName("Username").WithValue(message.Author.Mention).WithIsInline(true))
-                    .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!").WithIconUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
+                    .WithFields(new EmbedFieldBuilder().WithName("Username").WithValue(message.Author.Mention)
+                        .WithIsInline(true))
+                    .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!")
+                        .WithIconUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
                     .WithColor(Discord.Color.Magenta);
-                
+
                 var dmComponents = new ComponentBuilder()
                     .WithButton("Respond to DM", $"dm-respond-channel-{message.Channel.Id}", ButtonStyle.Success);
 
@@ -236,7 +248,7 @@ public class InteractionHandler
 
                 return;
             }
-            
+
             // Only protocol message when it is part of a ticket
             await ProtocolMessageIfTicket(message);
         }
@@ -254,7 +266,7 @@ public class InteractionHandler
                 await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has been banned.");
 
             _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been banned.");
-        }   
+        }
     }
 
     private async Task UserUnbanned(SocketUser user, SocketGuild guild)
@@ -269,6 +281,7 @@ public class InteractionHandler
             _logger.LogInformation($"User {user.Username}#{user.Discriminator} has been unbanned.");
         }
     }
+
     private async Task UserJoined(SocketGuildUser guildUser)
     {
         _logger.LogInformation("User {user} joined the guild {guildName}.", guildUser.Username, guildUser.Guild.Name);
@@ -281,23 +294,28 @@ public class InteractionHandler
             if (welcomeChannel != null)
             {
                 var embed = new EmbedBuilder()
-                .WithTitle($"Welcome to the Server, {guildUser}!")
-                .WithDescription("Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
-                .WithCurrentTimestamp()
-                .WithColor(Discord.Color.Magenta)
-                .WithFooter(new EmbedFooterBuilder()
-                    .WithText("Executed by FleckyBot#3339")
-                    .WithIconUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
-                .WithThumbnailUrl(guildUser.GetAvatarUrl())
-                .WithImageUrl("https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG");
+                    .WithTitle($"Welcome to the Server, {guildUser}!")
+                    .WithDescription(
+                        "Please do not forget to read and accept the rules in #rules!\n\nGodspeed, traveler!\n\nAlso, a pic from Flecky.")
+                    .WithCurrentTimestamp()
+                    .WithColor(Discord.Color.Magenta)
+                    .WithFooter(new EmbedFooterBuilder()
+                        .WithText("Executed by FleckyBot#3339")
+                        .WithIconUrl(
+                            "https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG?width=200&height=200"))
+                    .WithThumbnailUrl(guildUser.GetAvatarUrl())
+                    .WithImageUrl(
+                        "https://media.discordapp.net/attachments/974447018313408522/974447414285054032/IMG_0185.JPG");
 
                 await welcomeChannel.SendMessageAsync(embed: embed.Build());
             }
 
             if (logsChannel != null)
-                await logsChannel.SendMessageAsync($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+                await logsChannel.SendMessageAsync(
+                    $"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
 
-            _logger.LogInformation($"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
+            _logger.LogInformation(
+                $"User {guildUser.Username}#{guildUser.Discriminator} has joined the guild {guildUser.Guild.Name}!");
 
             var defaultRoles = new List<ulong>
             {
@@ -313,7 +331,8 @@ public class InteractionHandler
             using var scope = _scopeFactory.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(g => g.GuildId == guildUser.Guild.Id);
+            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles)
+                .FirstOrDefault(g => g.GuildId == guildUser.Guild.Id);
 
             if (guild != null && guild.ImportantGuildRoles != null)
             {
@@ -345,7 +364,8 @@ public class InteractionHandler
                 await goodbyeChannel.SendMessageAsync($"**{user}** just left the guild. Adieu!");
 
             if (logschannel != null)
-                await logschannel.SendMessageAsync($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
+                await logschannel.SendMessageAsync(
+                    $"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
 
             _logger.LogInformation($"User {user.Username}#{user.Discriminator} has left the guild {guild.Name}!");
         }
@@ -358,7 +378,8 @@ public class InteractionHandler
             SocketTextChannel? logschannel = role1.Guild.GetChannel(1065032230407245905) as SocketTextChannel;
 
             if (logschannel != null)
-                await logschannel.SendMessageAsync($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
+                await logschannel.SendMessageAsync(
+                    $"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
 
             _logger.LogInformation($"Role {role1.Name} has been changed to {role2.Name} in guild {role1.Guild.Name}.");
         }
@@ -393,7 +414,7 @@ public class InteractionHandler
     private async Task ModalSubmitted(SocketModal modal)
     {
         await modal.DeferAsync(ephemeral: true);
-        
+
         if (modal.Data.CustomId.Contains("dm-respond-"))
         {
             _logger.LogDebug("Received a modal to respond to a dm.");
@@ -412,7 +433,9 @@ public class InteractionHandler
                         .WithTitle("You have replied with:")
                         .WithDescription(data.Value)
                         .WithCurrentTimestamp()
-                        .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!").WithIconUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
+                        .WithFooter(new EmbedFooterBuilder().WithText("FleckyBot, your good boi!")
+                            .WithIconUrl(
+                                _client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl()))
                         .WithColor(Discord.Color.Green);
 
                     await modal.FollowupAsync(embed: dmEmbed.Build());
@@ -455,27 +478,7 @@ public class InteractionHandler
 
                         await modal.FollowupAsync("Der Termin wurde soeben hinzugefügt.", ephemeral: true);
 
-                        var embedTimetableList = new EmbedBuilder()
-                            .WithTitle("Derzeitige Termine")
-                            .WithDescription("Hier werden die derzeitigen Termine angezeigt.\n\nMögliche Termine:\n- Mo-Fr 20-23 Uhr\n- Sa-So 14-23 Uhr")
-                            .WithColor(Color.DarkPurple)
-                            .WithCurrentTimestamp();
-
-                        if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
-                            foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
-                                if (line.RequestedTime.HasValue)
-                                {
-                                    var accepted = line.IsApproved ? "✔" : "✖";
-
-                                    embedTimetableList.AddField(line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
-                                }
-
-                        var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
-
-                        await textChannel.ModifyMessageAsync(guild.GuildTimetableChannel.TimetableListMessageId, x =>
-                        {
-                            x.Embed = embedTimetableList.Build();
-                        });
+                        await ResendTimetableList(guild, guildUser);
 
                         return;
                     }
@@ -488,7 +491,8 @@ public class InteractionHandler
         private functions
     ---------------------- */
 
-    private SocketVoiceChannel? GetSleepyCategoryIfValid(ApplicationContext context, SocketVoiceChannel? sleepyVoiceChannel)
+    private SocketVoiceChannel? GetSleepyCategoryIfValid(ApplicationContext context,
+        SocketVoiceChannel? sleepyVoiceChannel)
     {
         if (sleepyVoiceChannel == null) return null;
 
@@ -508,7 +512,8 @@ public class InteractionHandler
         return sleepCategory == null ? null : sleepyVoiceChannel;
     }
 
-    private async Task CheckAndDeleteSleepyChannel(ApplicationContext context, SocketGuildUser guildUser, SocketVoiceState state1)
+    private async Task CheckAndDeleteSleepyChannel(ApplicationContext context, SocketGuildUser guildUser,
+        SocketVoiceState state1)
     {
         var guild = context.Guilds?
             .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
@@ -517,11 +522,13 @@ public class InteractionHandler
         {
             if (guild != null)
             {
-                var category = context.SleepCallCategorys?.Where(x => x.Guild == guild && x.CategoryId == state1.VoiceChannel.CategoryId).FirstOrDefault();
+                var category = context.SleepCallCategorys
+                    ?.Where(x => x.Guild == guild && x.CategoryId == state1.VoiceChannel.CategoryId).FirstOrDefault();
 
                 if (category != null)
                 {
-                    var channelToDelete = context.SleepCallActiveChannels.FirstOrDefault(x => x.SleepCallCategory == category && x.ChannelId == state1.VoiceChannel.Id);
+                    var channelToDelete = context.SleepCallActiveChannels.FirstOrDefault(x =>
+                        x.SleepCallCategory == category && x.ChannelId == state1.VoiceChannel.Id);
 
                     if (channelToDelete != null)
                     {
@@ -536,14 +543,16 @@ public class InteractionHandler
         }
     }
 
-    private async Task CheckAndCreateSleepyChannel(ApplicationContext context, SocketGuildUser guildUser, SocketVoiceState state2)
+    private async Task CheckAndCreateSleepyChannel(ApplicationContext context, SocketGuildUser guildUser,
+        SocketVoiceState state2)
     {
         var guild = context.Guilds?
-                .FirstOrDefault(x => x.GuildId == state2.VoiceChannel.Guild.Id);
+            .FirstOrDefault(x => x.GuildId == state2.VoiceChannel.Guild.Id);
 
         if (guild != null)
         {
-            var category = context.SleepCallCategorys?.Where(x => x.Guild == guild && x.CategoryId == state2.VoiceChannel.CategoryId).FirstOrDefault();
+            var category = context.SleepCallCategorys
+                ?.Where(x => x.Guild == guild && x.CategoryId == state2.VoiceChannel.CategoryId).FirstOrDefault();
 
             if (category != null)
             {
@@ -562,16 +571,19 @@ public class InteractionHandler
                     return;
                 }
 
-                var voiceChannel = context.SleepCallActiveChannels.FirstOrDefault(x => x.ChannelId == state2.VoiceChannel.Id && x.SleepCallCategory == category);
+                var voiceChannel = context.SleepCallActiveChannels.FirstOrDefault(x =>
+                    x.ChannelId == state2.VoiceChannel.Id && x.SleepCallCategory == category);
 
                 if (voiceChannel == null)
                 {
-                    var newSleepyChannel = await state2.VoiceChannel.Guild.CreateVoiceChannelAsync($"{guildUser.Username}'s Sleepy Channel", x => { x.CategoryId = category.CategoryId; });
+                    var newSleepyChannel = await state2.VoiceChannel.Guild.CreateVoiceChannelAsync(
+                        $"{guildUser.Username}'s Sleepy Channel", x => { x.CategoryId = category.CategoryId; });
 
                     await newSleepyChannel.SyncPermissionsAsync();
-                    await newSleepyChannel.AddPermissionOverwriteAsync(guildUser, OverwritePermissions.InheritAll.Modify(
-                        manageChannel: PermValue.Allow
-                    ));
+                    await newSleepyChannel.AddPermissionOverwriteAsync(guildUser,
+                        OverwritePermissions.InheritAll.Modify(
+                            manageChannel: PermValue.Allow
+                        ));
 
                     var newActiveChannel = new SleepCallActiveChannel
                     {
@@ -619,12 +631,16 @@ public class InteractionHandler
             using var scope = _scopeFactory.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == component.GuildId);
+            var guild = context.Guilds?.Include(x => x.ImportantGuildRoles)
+                .FirstOrDefault(x => x.GuildId == component.GuildId);
 
             if (guild != null && guild.ImportantGuildRoles != null)
             {
-                GuildRole unverified = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "unverified") ?? throw new Exception("Unverified role not found in database.");
-                GuildRole verified = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "verified") ?? throw new Exception("Unverified role not found in database.");
+                GuildRole unverified =
+                    guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "unverified") ??
+                    throw new Exception("Unverified role not found in database.");
+                GuildRole verified = guild.ImportantGuildRoles.FirstOrDefault(x => x.RoleDescription == "verified") ??
+                                     throw new Exception("Unverified role not found in database.");
 
                 var rulesRemove = new List<ulong>
                 {
@@ -646,13 +662,14 @@ public class InteractionHandler
             }
         }
     }
-    
+
     private async Task ProtocolMessageIfTicket(SocketMessage message)
     {
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-            Ticket? ticket = context.Ticket?.Where(x => x.ChannelId == message.Channel.Id).Include(y => y.TicketMessages).FirstOrDefault();
+            Ticket? ticket = context.Ticket?.Where(x => x.ChannelId == message.Channel.Id)
+                .Include(y => y.TicketMessages).FirstOrDefault();
 
             if (ticket == null)
                 return;
@@ -662,7 +679,8 @@ public class InteractionHandler
 
                 if (ticket.TicketMessages != null)
                 {
-                    ticket.TicketMessages.Add(new TicketMessage {
+                    ticket.TicketMessages.Add(new TicketMessage
+                    {
                         UserId = message.Author.Id,
                         UserName = $"{message.Author.Username}#{message.Author.Discriminator}",
                         Message = message.CleanContent,
@@ -673,8 +691,10 @@ public class InteractionHandler
                 }
                 else
                 {
-                    ticket.TicketMessages = new List<TicketMessage>{
-                        new TicketMessage {
+                    ticket.TicketMessages = new List<TicketMessage>
+                    {
+                        new TicketMessage
+                        {
                             UserId = message.Author.Id,
                             UserName = $"{message.Author.Username}#{message.Author.Discriminator}",
                             Message = message.CleanContent,
@@ -742,8 +762,10 @@ public class InteractionHandler
 
                     if (voteUser != null)
                     {
-                        _logger.LogWarning($"User {component.User} has already voted on message id {component.Message.Id}. Skipping...");
-                        await component.FollowupAsync("You already voted on that one. One vote per user only.", ephemeral: true);
+                        _logger.LogWarning(
+                            $"User {component.User} has already voted on message id {component.Message.Id}. Skipping...");
+                        await component.FollowupAsync("You already voted on that one. One vote per user only.",
+                            ephemeral: true);
                         return;
                     }
 
@@ -756,7 +778,8 @@ public class InteractionHandler
 
                     await context.SaveChangesAsync();
 
-                    _logger.LogInformation($"Added choice {choice} to vote {vote.MessageId} for user {component.User}.");
+                    _logger.LogInformation(
+                        $"Added choice {choice} to vote {vote.MessageId} for user {component.User}.");
                     await component.FollowupAsync("Added choice to vote.", ephemeral: true);
                 }
                 else if (vote.VoteByUser == null)
@@ -773,7 +796,8 @@ public class InteractionHandler
 
                     await context.SaveChangesAsync();
 
-                    _logger.LogInformation($"Added choice {choice} to vote {vote.MessageId} for user {component.User}.");
+                    _logger.LogInformation(
+                        $"Added choice {choice} to vote {vote.MessageId} for user {component.User}.");
                     await component.FollowupAsync("Added choice to vote.", ephemeral: true);
                 }
                 else
@@ -784,8 +808,11 @@ public class InteractionHandler
             }
             else
             {
-                _logger.LogInformation($"No vote with the message id {component.Message.Id} could be found. Ignoring...");
-                await component.FollowupAsync($"I was not able to find a vote corresponding to that message. Something went wrong here...", ephemeral: true);
+                _logger.LogInformation(
+                    $"No vote with the message id {component.Message.Id} could be found. Ignoring...");
+                await component.FollowupAsync(
+                    $"I was not able to find a vote corresponding to that message. Something went wrong here...",
+                    ephemeral: true);
             }
         }
     }
@@ -804,10 +831,11 @@ public class InteractionHandler
             {
                 if (vote.UserId != component.User.Id)
                 {
-                    await component.FollowupAsync("You did not start the vote. Only the owner of the vote can close the vote.");
+                    await component.FollowupAsync(
+                        "You did not start the vote. Only the owner of the vote can close the vote.");
                     return;
                 }
-                
+
                 vote.isOpen = false;
 
                 await context.SaveChangesAsync();
@@ -828,7 +856,9 @@ public class InteractionHandler
                     .AddField(new EmbedFieldBuilder().WithName("Yes:").WithValue(yesVotes).WithIsInline(true))
                     .AddField(new EmbedFieldBuilder().WithName("No:").WithValue(noVotes).WithIsInline(true))
                     .WithCurrentTimestamp()
-                    .WithFooter(new EmbedFooterBuilder().WithText($"Executed by {component.User.Username}#{component.User.Discriminator}").WithIconUrl(component.User.GetAvatarUrl()));
+                    .WithFooter(new EmbedFooterBuilder()
+                        .WithText($"Executed by {component.User.Username}#{component.User.Discriminator}")
+                        .WithIconUrl(component.User.GetAvatarUrl()));
 
                 await component.ModifyOriginalResponseAsync(x =>
                 {
@@ -841,7 +871,9 @@ public class InteractionHandler
             else
             {
                 _logger.LogError($"There is no vote with message id {component.Message.Id}! Aborting...");
-                await component.FollowupAsync("Sorry but I was not able to close the ticket. I was not able to find the vote in the database.", ephemeral: true);
+                await component.FollowupAsync(
+                    "Sorry but I was not able to close the ticket. I was not able to find the vote in the database.",
+                    ephemeral: true);
                 return;
             }
         }
@@ -868,14 +900,16 @@ public class InteractionHandler
                 {
                     case "menu-ticket-category-admin":
                         if (guild.GuildTicketsChannel?.GuildTicketsGroups != null)
-                            role = channel.Guild.GetRole(guild.GuildTicketsChannel.GuildTicketsGroups.Where(x => x.GroupType == "admin").First().GroupId);
+                            role = channel.Guild.GetRole(guild.GuildTicketsChannel.GuildTicketsGroups
+                                .Where(x => x.GroupType == "admin").First().GroupId);
                         await channel.AddPermissionOverwriteAsync(role, OverwritePermissions.AllowAll(channel));
                         if (role != null)
                             mentionedRole = role.Mention;
                         break;
                     case "menu-ticket-category-mod":
                         if (guild.GuildTicketsChannel?.GuildTicketsGroups != null)
-                            role = channel.Guild.GetRole(guild.GuildTicketsChannel.GuildTicketsGroups.Where(x => x.GroupType == "mod").First().GroupId);
+                            role = channel.Guild.GetRole(guild.GuildTicketsChannel.GuildTicketsGroups
+                                .Where(x => x.GroupType == "mod").First().GroupId);
                         await channel.AddPermissionOverwriteAsync(role, OverwritePermissions.AllowAll(channel));
                         if (role != null)
                             mentionedRole = role.Mention;
@@ -887,15 +921,18 @@ public class InteractionHandler
 
                 var embedTicket = new EmbedBuilder()
                     .WithTitle($"{component.User.Username}'s Ticket")
-                    .WithDescription($"This is a ticket that only the group {mentionedRole} and you can see. Write along\n\nIf you are finished with the ticket, click the Close button.")
+                    .WithDescription(
+                        $"This is a ticket that only the group {mentionedRole} and you can see. Write along\n\nIf you are finished with the ticket, click the Close button.")
                     .WithColor(Discord.Color.Magenta)
                     .WithCurrentTimestamp()
-                    .WithFooter(new EmbedFooterBuilder().WithText($"Executed by {component.User}").WithIconUrl(component.User.GetAvatarUrl()));
+                    .WithFooter(new EmbedFooterBuilder().WithText($"Executed by {component.User}")
+                        .WithIconUrl(component.User.GetAvatarUrl()));
 
                 var buttonTicket = new ComponentBuilder()
                     .WithButton("Close Ticket", "close-ticket", ButtonStyle.Danger);
 
-                await component.ModifyOriginalResponseAsync(x => {
+                await component.ModifyOriginalResponseAsync(x =>
+                {
                     x.Embed = embedTicket.Build();
                     x.Components = buttonTicket.Build();
                     x.Content = "";
@@ -917,7 +954,7 @@ public class InteractionHandler
             Ticket? ticket = context.Ticket.Where(x => x.ChannelId == component.Channel.Id)
                 .Include(y => y.TicketMessages)
                 .FirstOrDefault();
-            
+
             if (ticket != null)
             {
                 ticket.IsOpen = false;
@@ -927,11 +964,13 @@ public class InteractionHandler
                 SocketTextChannel channel = (SocketTextChannel)component.Channel;
                 await channel.DeleteAsync();
 
-                _logger.LogInformation($"Ticket with the name {ticket.ChannelName} ({ticket.ChannelId}) has been closed.");
+                _logger.LogInformation(
+                    $"Ticket with the name {ticket.ChannelName} ({ticket.ChannelId}) has been closed.");
             }
             else
             {
-                _logger.LogError($"I was not able to find a ticket with the id {component.Message.Id} in the database. Aborting....");
+                _logger.LogError(
+                    $"I was not able to find a ticket with the id {component.Message.Id} in the database. Aborting....");
                 return;
             }
         }
@@ -952,20 +991,22 @@ public class InteractionHandler
 
         if (guild != null)
         {
-            var guildTicket = await guildUser.Guild.CreateTextChannelAsync(channelName, x => {
+            var guildTicket = await guildUser.Guild.CreateTextChannelAsync(channelName, x =>
+            {
                 x.CategoryId = guild.GuildTicketsChannel?.ChannelId;
                 x.Topic = $"This ticket has been created in behalf of {guildUser.Username}";
             });
 
             await guildTicket.SyncPermissionsAsync();
-            await guildTicket.AddPermissionOverwriteAsync(messageComponent.User, OverwritePermissions.DenyAll(guildTicket).Modify(
-                sendMessages: PermValue.Allow,
-                addReactions: PermValue.Allow,
-                embedLinks: PermValue.Allow,
-                readMessageHistory: PermValue.Allow,
-                viewChannel: PermValue.Allow,
-                attachFiles: PermValue.Allow
-            ));
+            await guildTicket.AddPermissionOverwriteAsync(messageComponent.User, OverwritePermissions
+                .DenyAll(guildTicket).Modify(
+                    sendMessages: PermValue.Allow,
+                    addReactions: PermValue.Allow,
+                    embedLinks: PermValue.Allow,
+                    readMessageHistory: PermValue.Allow,
+                    viewChannel: PermValue.Allow,
+                    attachFiles: PermValue.Allow
+                ));
 
             context.Ticket?.Add(new Ticket
             {
@@ -979,7 +1020,8 @@ public class InteractionHandler
 
             await context.SaveChangesAsync();
 
-            await messageComponent.FollowupAsync($"Ticket {guildTicket.Mention} has been created.", allowedMentions: AllowedMentions.All, ephemeral: true);
+            await messageComponent.FollowupAsync($"Ticket {guildTicket.Mention} has been created.",
+                allowedMentions: AllowedMentions.All, ephemeral: true);
 
             var menu = new SelectMenuBuilder()
                 .WithPlaceholder("Select an option")
@@ -990,7 +1032,8 @@ public class InteractionHandler
             if (guild.GuildTicketsChannel?.GuildTicketsGroups != null)
                 foreach (GuildTicketsGroup group in guild.GuildTicketsChannel.GuildTicketsGroups)
                 {
-                    menu.AddOption($"Talk with {group.GroupName}", $"menu-ticket-category-{group.GroupType}", $"Choose this if you want to talk with {group.GroupName}");
+                    menu.AddOption($"Talk with {group.GroupName}", $"menu-ticket-category-{group.GroupType}",
+                        $"Choose this if you want to talk with {group.GroupName}");
                     var groupRole = guildUser.Guild.GetRole(group.GroupId);
                     await guildTicket.AddPermissionOverwriteAsync(groupRole, OverwritePermissions.DenyAll(guildTicket));
                 }
@@ -998,14 +1041,18 @@ public class InteractionHandler
             var component = new ComponentBuilder()
                 .WithSelectMenu(menu);
 
-            await guildTicket.SendMessageAsync("Ticket has been created! Please choose an option to get this ticket to the right group.", components: component.Build());
+            await guildTicket.SendMessageAsync(
+                "Ticket has been created! Please choose an option to get this ticket to the right group.",
+                components: component.Build());
 
-            _logger.LogInformation("Ticket with the name {name} ({id}) has been created.", guildTicket.Name, guildTicket.Id);
+            _logger.LogInformation("Ticket with the name {name} ({id}) has been created.", guildTicket.Name,
+                guildTicket.Id);
         }
         else
         {
             _logger.LogWarning($"Guild is not set up. Cannot create ticket. Aborting....");
-            await messageComponent.FollowupAsync("This guild has not been set up for the ticket system. Please use the `/setup` command to set it up.");
+            await messageComponent.FollowupAsync(
+                "This guild has not been set up for the ticket system. Please use the `/setup` command to set it up.");
             return;
         }
     }
@@ -1026,7 +1073,9 @@ public class InteractionHandler
         var modal = new ModalBuilder()
             .WithCustomId("appointment-create")
             .WithTitle("Termin ausmachen")
-            .AddTextInput("Gewünschter Termin", "appointment-create-datetime", TextInputStyle.Short, DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true, value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
+            .AddTextInput("Gewünschter Termin", "appointment-create-datetime", TextInputStyle.Short,
+                DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true,
+                value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
 
         await component.RespondWithModalAsync(modal.Build());
     }
@@ -1040,16 +1089,17 @@ public class InteractionHandler
 
             var guild = context.Guilds?
                 .Include(x => x.GuildTimetableLines)
+                .Include(x => x.GuildTimetableChannel)
                 .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
 
-            if (guild != null && guild.GuildTimetableLines != null)
+            if (guild != null && guild.GuildTimetableLines != null && guild.GuildTimetableChannel != null)
             {
                 _logger.LogDebug("Guild {guildName} found.", guild.GuildName);
 
                 foreach (var value in component.Data.Values)
                 {
                     _logger.LogDebug("Got value {rawId} from component.", value);
-                    
+
                     var id = int.Parse(value);
 
                     _logger.LogDebug("Appointment with ID {appointmentId} successfully parsed.", id);
@@ -1066,10 +1116,41 @@ public class InteractionHandler
 
                         _logger.LogInformation("Appointment with ID {id} has been deleted.", id);
 
-                        await component.FollowupAsync("Termin wurde soeben gelöscht.");
+                        await component.FollowupAsync("Termin wurde soeben gelöscht.", ephemeral: true);
+                        await component.DeleteOriginalResponseAsync();
+
+                        await ResendTimetableList(guild, guildUser);
                     }
                 }
             }
+        }
+    }
+
+    private async Task ResendTimetableList(Guild guild, SocketGuildUser guildUser)
+    {
+        if (guild.GuildTimetableChannel != null)
+        {
+            var embedTimetableList = new EmbedBuilder()
+                .WithTitle("Derzeitige Termine")
+                .WithDescription("Hier werden die derzeitigen Termine angezeigt.\n\nMögliche Termine:\n- Mo-Fr 20-23 Uhr\n- Sa-So 14-23 Uhr")
+                .WithColor(Color.DarkPurple)
+                .WithCurrentTimestamp();
+
+            if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
+                foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
+                    if (line.RequestedTime.HasValue)
+                    {
+                        var accepted = line.IsApproved ? "✔" : "✖";
+
+                        embedTimetableList.AddField(line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
+                    }
+
+            var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
+
+            await textChannel.ModifyMessageAsync(guild.GuildTimetableChannel.TimetableListMessageId, x =>
+            {
+                x.Embed = embedTimetableList.Build();
+            });
         }
     }
 }
