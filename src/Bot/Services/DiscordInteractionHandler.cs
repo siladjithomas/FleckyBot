@@ -1044,15 +1044,23 @@ public class InteractionHandler
 
             if (guild != null && guild.GuildTimetableLines != null)
             {
+                _logger.LogDebug("Guild {guildName} found.", guild.GuildName);
+                
                 int id = int.Parse(component.Data.Value);
+
+                _logger.LogDebug("Appointment with ID {appointmentId} successfully parsed.", id);
 
                 var lineToDelete = context.GuildTimetableLines?.FirstOrDefault(x => x.Id == id);
 
                 if (lineToDelete != null)
                 {
+                    _logger.LogDebug("Found line with ID {lineToDeleteId}. Time to delete!", lineToDelete.Id);
+                    
                     context.GuildTimetableLines?.Remove(lineToDelete);
 
                     await context.SaveChangesAsync();
+
+                    _logger.LogInformation("Appointment with ID {id} has been deleted.", id);
 
                     await component.FollowupAsync("Termin wurde soeben gelöscht.");
                 }
