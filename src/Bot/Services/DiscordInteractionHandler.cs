@@ -139,6 +139,9 @@ public class InteractionHandler
             case "menu-ticket-category":
                 await TicketSetRights(component);
                 break;
+            case "appointment-delete":
+                await AppointmentDelete(component);
+                break;
             default:
                 _logger.LogInformation("Ah snap! I can't do anything with custom id {customId}!", component.Data.CustomId);
                 break;
@@ -464,7 +467,7 @@ public class InteractionHandler
                                 {
                                     var accepted = line.IsApproved ? "✔" : "✖";
 
-                                    embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})", true);
+                                    embedTimetableList.AddField(line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
                                 }
 
                         var textChannel = guildUser.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
@@ -1026,5 +1029,34 @@ public class InteractionHandler
             .AddTextInput("Gewünschter Termin", "appointment-create-datetime", TextInputStyle.Short, DateTime.Now.ToString("dd.MM.yyyy HH:mm"), required: true, value: DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
 
         await component.RespondWithModalAsync(modal.Build());
+    }
+
+    private async Task AppointmentDelete(SocketMessageComponent component)
+    {
+        if (component.User is SocketGuildUser guildUser)
+        {
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            var guild = context.Guilds?
+                .Include(x => x.GuildTimetableLines)
+                .FirstOrDefault(x => x.GuildId == guildUser.Guild.Id);
+
+            if (guild != null && guild.GuildTimetableLines != null)
+            {
+                int id = int.Parse(component.Data.Value);
+
+                var lineToDelete = context.GuildTimetableLines?.FirstOrDefault(x => x.Id == id);
+
+                if (lineToDelete != null)
+                {
+                    context.GuildTimetableLines?.Remove(lineToDelete);
+
+                    await context.SaveChangesAsync();
+
+                    await component.FollowupAsync("Termin wurde soeben gelöscht.");
+                }
+            }
+        }
     }
 }

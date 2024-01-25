@@ -59,8 +59,8 @@ namespace Bot.Modules
                         if (line.RequestedTime.HasValue)
                         {
                             var accepted = line.IsApproved ? "✔" : "✖";
-                            
-                            embedTimetableList.AddField(line.RequestingUserName, line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm") + $"({accepted})", true);
+
+                            embedTimetableList.AddField(line.RequestedTime.Value.ToString("dd.MM.yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
                         }
                 
                 var timetableListMessage = await channel.SendMessageAsync(embed: embedTimetableList.Build());
@@ -183,6 +183,39 @@ namespace Bot.Modules
             {
                 await FollowupAsync("Die Gilde wurde nicht eingerichtet.");
             }
+        }
+
+        [RequireRole(1199324451335061554)]
+        [SlashCommand("delete", "Delete an appointment")]
+        public async Task DeleteAppointment()
+        {
+            await DeferAsync(ephemeral: true);
+
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            var guild = context.Guilds?
+                .Include(x => x.GuildTimetableChannel)
+                .Include(x => x.GuildTimetableLines)
+                .FirstOrDefault(x => x.GuildId == Context.Guild.Id);
+
+            if (guild != null && guild.GuildTimetableChannel != null && guild.GuildTimetableLines != null)
+            {
+                var deleteAppointmentSelect = new SelectMenuBuilder()
+                    .WithCustomId("appointment-delete");
+
+                foreach (GuildTimetableLine line in guild.GuildTimetableLines)
+                    deleteAppointmentSelect.AddOption($"{line.RequestedTime} from {line.RequestingUserName}",
+                        $"{line.Id}");
+
+                var components = new ComponentBuilder()
+                    .WithSelectMenu(deleteAppointmentSelect);
+
+                await FollowupAsync("Welchen Termin willst du löschen?", components: components.Build());
+                return;
+            }
+
+            await FollowupAsync("");
         }
     }
 }
