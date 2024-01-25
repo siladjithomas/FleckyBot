@@ -130,6 +130,8 @@ namespace Bot.Modules
                 _logger.LogDebug("Added appointment from {user} on {dateTime}", requestingUser, startTime.ToString(CultureInfo.CurrentCulture));
 
                 await FollowupAsync($"Added appointment from {requestingUser.Mention} on {startTime}");
+
+                await ResendTimetableList(guild);
             }
             else if (guild != null && guild.GuildTimetableChannel == null)
             {
@@ -174,6 +176,8 @@ namespace Bot.Modules
                 _logger.LogDebug("Requested appointment from {user} on {dateTime}", Context.User, startTime.ToString(CultureInfo.CurrentCulture));
 
                 await FollowupAsync($"Termin auf {startTime} gesetzt. Warte auf Bestätigung...");
+
+                await ResendTimetableList(guild);
             }
             else if (guild != null && guild.GuildTimetableChannel == null)
             {
@@ -249,6 +253,40 @@ namespace Bot.Modules
             }
 
             await FollowupAsync("");
+        }
+
+        private async Task ResendTimetableList(Guild guild)
+        {
+            if (guild.GuildTimetableChannel != null)
+            {
+                var embedTimetableList = new EmbedBuilder()
+                    .WithTitle("Derzeitige Termine")
+                    .WithDescription("Hier werden die derzeitigen Termine angezeigt.\n\nMögliche Termine:\n- Mo-Fr 20-23 Uhr\n- Sa-So 14-23 Uhr")
+                    .WithColor(Color.DarkPurple)
+                    .WithCurrentTimestamp();
+
+                if (guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
+                {
+                    foreach (var line in guild.GuildTimetableLines.FindAll(x => x.RequestedTime >= DateTime.Today && !x.IsDone))
+                        if (line.RequestedTime.HasValue)
+                        {
+                            var accepted = line.IsApproved ? "✔" : "✖";
+
+                            embedTimetableList.AddField(line.RequestedTime.Value.ToString("dddd, dd MMMM yyyy HH:mm"), line.RequestingUserName + $"\nAccepted: ({accepted})", true);
+                        }
+                }
+                else
+                {
+                    embedTimetableList.Description += "\n\n***Derzeit sind keine Termine vergeben.***";
+                }
+
+                var textChannel = Context.Guild.GetTextChannel(guild.GuildTimetableChannel.ChannelId);
+
+                await textChannel.ModifyMessageAsync(guild.GuildTimetableChannel.TimetableListMessageId, x =>
+                {
+                    x.Embed = embedTimetableList.Build();
+                });
+            }
         }
     }
 }
