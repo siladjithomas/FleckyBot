@@ -57,8 +57,8 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddQuartz(q => 
         {
-            //q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
             //q.AddJobAndTrigger<CheckDMMessages>(hostContext.Configuration);
+            q.AddJobAndTrigger<BotStatus>(hostContext.Configuration);
             q.AddJobAndTrigger<TimetableService>(hostContext.Configuration);
         });
 
