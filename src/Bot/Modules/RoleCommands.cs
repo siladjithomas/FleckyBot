@@ -30,8 +30,8 @@ namespace TsubaHaru.FleckyBot.Bot.Modules
         {
             await DeferAsync(ephemeral: true);
 
-            using var scope = _scopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
             var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 
@@ -70,8 +70,8 @@ namespace TsubaHaru.FleckyBot.Bot.Modules
         {
             await DeferAsync(ephemeral: true);
 
-            using var scope = _scopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+            await using var scope = _scopeFactory.CreateAsyncScope();
+            await using var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
             var guild = context.Guilds?.Include(x => x.ImportantGuildRoles).FirstOrDefault(x => x.GuildId == Context.Guild.Id);
 

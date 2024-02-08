@@ -32,9 +32,11 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         BotSettings botSettings = hostContext.Configuration.GetSection(nameof(BotSettings)).Get<BotSettings>() ?? throw new KeyNotFoundException("Bot Settings in config file not found.");
         MailSettings mailSettings = hostContext.Configuration.GetSection(nameof(MailSettings)).Get<MailSettings>() ?? throw new KeyNotFoundException("Mail Settings in config file not found.");
+        VRChatSettings vrChatSettings = hostContext.Configuration.GetSection(nameof(VRChatSettings)).Get<VRChatSettings>() ?? throw new KeyNotFoundException("VRChat Settings in config file not found.");
         
         services.AddSingleton(botSettings);
         services.AddSingleton(mailSettings);
+        services.AddSingleton(vrChatSettings);
 
         var discordSocketConfig = new DiscordSocketConfig
         {
@@ -76,6 +78,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<CommandHandler>();
         // TODO: Properly implement the mail service for vrchat 2fa code
         services.AddSingleton<MailService>();
+        services.AddSingleton<VRChatService>();
         services.AddSingleton<InteractionHandler>();
 
         services.AddDbContext<ApplicationContext>(options => 
