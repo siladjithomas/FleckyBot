@@ -2,12 +2,10 @@ using System.Globalization;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using Bot.Models;
-using Bot.Services;
-using Quartz;
+using TsubaHaru.FleckyBot.Bot.Models;
+using TsubaHaru.FleckyBot.Bot.Services;
 
-namespace Bot;
+namespace TsubaHaru.FleckyBot.Bot;
 
 public class Worker : BackgroundService
 {

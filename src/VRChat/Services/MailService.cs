@@ -1,19 +1,16 @@
-﻿using System;
-using MimeKit;
-using MailKit;
-using MailKit.Search;
+﻿using MailKit;
 using MailKit.Net.Imap;
-using Serilog;
-using Bot.Models;
+using Microsoft.Extensions.Logging;
+using TsubaHaru.FleckyBot.VRChat.Models;
 
-namespace Bot.Services;
+namespace TsubaHaru.FleckyBot.VRChat.Services;
 
 public class MailService
 {
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<MailService> _logger;
     private readonly MailSettings _settings;
 
-    public MailService(ILogger<Worker> logger, MailSettings settings)
+    public MailService(ILogger<MailService> logger, MailSettings settings)
     {
         _logger = logger;
         _settings = settings;

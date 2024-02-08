@@ -1,15 +1,8 @@
 using Discord;
-using Discord.Interactions;
 using Discord.WebSocket;
-using Bot.Models;
-using Database.DatabaseContexts;
-using Database.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Serilog;
 using Quartz;
 
-namespace Bot.Services;
+namespace TsubaHaru.FleckyBot.Bot.Services;
 
 [DisallowConcurrentExecution]
 public class BotStatus : IJob

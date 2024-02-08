@@ -12,20 +12,51 @@ using TsubaHaru.FleckyBot.Database.DatabaseContexts;
 namespace Bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230611123110_DBSignupChange_AddName")]
-    partial class DBSignupChange_AddName
+    [Migration("20240208133940_DBBirthdayRefactor")]
+    partial class DBBirthdayRefactor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Database.Models.Guild", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.BirthdayUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Birthday")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("GuildName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("UserId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BirthdayUser");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,6 +73,10 @@ namespace Bot.Migrations
                     b.Property<decimal>("GuildId")
                         .HasColumnType("decimal(20,0)");
 
+                    b.Property<string>("GuildLanguageCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
                     b.Property<string>("GuildName")
                         .HasColumnType("nvarchar(max)");
 
@@ -50,7 +85,34 @@ namespace Bot.Migrations
                     b.ToTable("Guilds");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RoleId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("ImportantGuildRoles");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRolesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -66,7 +128,67 @@ namespace Bot.Migrations
                     b.ToTable("GuildRolesChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RuleLanguage")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<string>("RuleText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("GuildRules");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRuleChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("MessageId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GuildRuleChannels");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSignupChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GuildSignupChannel");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSystemMessagesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -82,7 +204,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildSystemMessagesChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -98,7 +220,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildTicketsChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,7 +247,62 @@ namespace Bot.Migrations
                     b.ToTable("GuildTicketsGroups");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTimetableChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("RequestAppointmentMessageId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("TimetableListMessageId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GuildTimetableChannel");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTimetableLine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("RequestedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("RequestingUserId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("RequestingUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("GuildTimetableLines");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildVotesChannel", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -141,7 +318,7 @@ namespace Bot.Migrations
                     b.ToTable("GuildVotesChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.Image", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -342,7 +519,7 @@ namespace Bot.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Database.Models.Quote", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Quote", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -9515,7 +9692,7 @@ namespace Bot.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Database.Models.RequestableRole", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.RequestableRole", b =>
                 {
                     b.Property<decimal>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -9536,7 +9713,7 @@ namespace Bot.Migrations
                     b.ToTable("RequestableRoles");
                 });
 
-            modelBuilder.Entity("Database.Models.Signup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Signup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9578,7 +9755,7 @@ namespace Bot.Migrations
                     b.ToTable("Signup");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAllowedGroup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAllowedGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9599,7 +9776,7 @@ namespace Bot.Migrations
                     b.ToTable("SignupAllowedGroup");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAllowedToEdit", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAllowedToEdit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9620,7 +9797,7 @@ namespace Bot.Migrations
                     b.ToTable("SignupAllowedToEdit");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAttendee", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAttendee", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9646,7 +9823,7 @@ namespace Bot.Migrations
                     b.ToTable("SignupAttendee");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupCategory", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9668,7 +9845,194 @@ namespace Bot.Migrations
                     b.ToTable("SignupCategory");
                 });
 
-            modelBuilder.Entity("Database.Models.Ticket", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallActiveChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SleepCallCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SleepCallCategoryId");
+
+                    b.ToTable("SleepCallActiveChannels");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CategoryId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("SleepCallCategorys");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("RoleId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SleepCallCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SleepCallCategoryId");
+
+                    b.ToTable("SleepCallGroups");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallIgnoredChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("ChannelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("SleepCallIgnoredChannels");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramChat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChatBio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChatDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ChatType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChatUsername")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TelegramChat");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("TelegramMessage");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TelegramUser");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9699,7 +10063,7 @@ namespace Bot.Migrations
                     b.ToTable("Ticket");
                 });
 
-            modelBuilder.Entity("Database.Models.TicketMessage", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TicketMessage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9729,7 +10093,7 @@ namespace Bot.Migrations
                     b.ToTable("TicketMessage");
                 });
 
-            modelBuilder.Entity("Database.Models.Vote", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Vote", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9757,7 +10121,7 @@ namespace Bot.Migrations
                     b.ToTable("Vote");
                 });
 
-            modelBuilder.Entity("Database.Models.VoteUser", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.VoteUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -9784,36 +10148,74 @@ namespace Bot.Migrations
                     b.ToTable("VoteUser");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildRolesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRole", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("ImportantGuildRoles")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRolesChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildRolesChannel")
-                        .HasForeignKey("Database.Models.GuildRolesChannel", "Id");
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRolesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildSystemMessagesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRule", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("GuildRules")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRuleChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithOne("GuildRuleChannel")
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildRuleChannel", "Id");
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSignupChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithOne("GuildSignupChannel")
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSignupChannel", "Id");
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSystemMessagesChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildSystemMessagesChannel")
-                        .HasForeignKey("Database.Models.GuildSystemMessagesChannel", "Id");
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildSystemMessagesChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
                         .WithOne("GuildTicketsChannel")
-                        .HasForeignKey("Database.Models.GuildTicketsChannel", "Id");
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsGroup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsGroup", b =>
                 {
-                    b.HasOne("Database.Models.GuildTicketsChannel", "GuildTicketsChannel")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsChannel", "GuildTicketsChannel")
                         .WithMany("GuildTicketsGroups")
                         .HasForeignKey("GuildTicketsChannelId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9821,18 +10223,37 @@ namespace Bot.Migrations
                     b.Navigation("GuildTicketsChannel");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildVotesChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTimetableChannel", b =>
                 {
-                    b.HasOne("Database.Models.Guild", "Guild")
-                        .WithOne("GuildVotesChannel")
-                        .HasForeignKey("Database.Models.GuildVotesChannel", "Id");
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithOne("GuildTimetableChannel")
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTimetableChannel", "Id");
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAllowedGroup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTimetableLine", b =>
                 {
-                    b.HasOne("Database.Models.Signup", "Signup")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("GuildTimetableLines")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildVotesChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithOne("GuildVotesChannel")
+                        .HasForeignKey("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildVotesChannel", "Id");
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAllowedGroup", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Signup", "Signup")
                         .WithMany("SignupRestrictedTo")
                         .HasForeignKey("SignupId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9840,9 +10261,9 @@ namespace Bot.Migrations
                     b.Navigation("Signup");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAllowedToEdit", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAllowedToEdit", b =>
                 {
-                    b.HasOne("Database.Models.Signup", "Signup")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Signup", "Signup")
                         .WithMany("SignupAllowedToEdit")
                         .HasForeignKey("SignupId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9850,13 +10271,13 @@ namespace Bot.Migrations
                     b.Navigation("Signup");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupAttendee", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupAttendee", b =>
                 {
-                    b.HasOne("Database.Models.SignupCategory", null)
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.SignupCategory", null)
                         .WithMany("Attendees")
                         .HasForeignKey("SignupCategoryId");
 
-                    b.HasOne("Database.Models.Signup", "Signup")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Signup", "Signup")
                         .WithMany()
                         .HasForeignKey("SignupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -9865,9 +10286,9 @@ namespace Bot.Migrations
                     b.Navigation("Signup");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupCategory", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupCategory", b =>
                 {
-                    b.HasOne("Database.Models.Signup", "Signup")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Signup", "Signup")
                         .WithMany("SignupCategories")
                         .HasForeignKey("SignupId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9875,9 +10296,69 @@ namespace Bot.Migrations
                     b.Navigation("Signup");
                 });
 
-            modelBuilder.Entity("Database.Models.TicketMessage", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallActiveChannel", b =>
                 {
-                    b.HasOne("Database.Models.Ticket", "Ticket")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallCategory", "SleepCallCategory")
+                        .WithMany("SleepCallActiveChannels")
+                        .HasForeignKey("SleepCallCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SleepCallCategory");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("SleepCallCategories")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallGroup", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallCategory", "SleepCallCategory")
+                        .WithMany("SleepCallGroups")
+                        .HasForeignKey("SleepCallCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SleepCallCategory");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallIgnoredChannel", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", "Guild")
+                        .WithMany("SleepCallIgnoredChannels")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramChat", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.TelegramUser", "User")
+                        .WithMany("Chats")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramMessage", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.TelegramChat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Chat");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TicketMessage", b =>
+                {
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Ticket", "Ticket")
                         .WithMany("TicketMessages")
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9885,9 +10366,9 @@ namespace Bot.Migrations
                     b.Navigation("Ticket");
                 });
 
-            modelBuilder.Entity("Database.Models.VoteUser", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.VoteUser", b =>
                 {
-                    b.HasOne("Database.Models.Vote", "Vote")
+                    b.HasOne("TsubaHaru.FleckyBot.Database.Models.Vote", "Vote")
                         .WithMany("VoteByUser")
                         .HasForeignKey("VoteId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -9895,23 +10376,39 @@ namespace Bot.Migrations
                     b.Navigation("Vote");
                 });
 
-            modelBuilder.Entity("Database.Models.Guild", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.Guild", b =>
                 {
                     b.Navigation("GuildRolesChannel");
+
+                    b.Navigation("GuildRuleChannel");
+
+                    b.Navigation("GuildRules");
+
+                    b.Navigation("GuildSignupChannel");
 
                     b.Navigation("GuildSystemMessagesChannel");
 
                     b.Navigation("GuildTicketsChannel");
 
+                    b.Navigation("GuildTimetableChannel");
+
+                    b.Navigation("GuildTimetableLines");
+
                     b.Navigation("GuildVotesChannel");
+
+                    b.Navigation("ImportantGuildRoles");
+
+                    b.Navigation("SleepCallCategories");
+
+                    b.Navigation("SleepCallIgnoredChannels");
                 });
 
-            modelBuilder.Entity("Database.Models.GuildTicketsChannel", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Guilds.GuildTicketsChannel", b =>
                 {
                     b.Navigation("GuildTicketsGroups");
                 });
 
-            modelBuilder.Entity("Database.Models.Signup", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Signup", b =>
                 {
                     b.Navigation("SignupAllowedToEdit");
 
@@ -9920,17 +10417,34 @@ namespace Bot.Migrations
                     b.Navigation("SignupRestrictedTo");
                 });
 
-            modelBuilder.Entity("Database.Models.SignupCategory", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SignupCategory", b =>
                 {
                     b.Navigation("Attendees");
                 });
 
-            modelBuilder.Entity("Database.Models.Ticket", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.SleepCalls.SleepCallCategory", b =>
+                {
+                    b.Navigation("SleepCallActiveChannels");
+
+                    b.Navigation("SleepCallGroups");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramChat", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.TelegramUser", b =>
+                {
+                    b.Navigation("Chats");
+                });
+
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Ticket", b =>
                 {
                     b.Navigation("TicketMessages");
                 });
 
-            modelBuilder.Entity("Database.Models.Vote", b =>
+            modelBuilder.Entity("TsubaHaru.FleckyBot.Database.Models.Vote", b =>
                 {
                     b.Navigation("VoteByUser");
                 });

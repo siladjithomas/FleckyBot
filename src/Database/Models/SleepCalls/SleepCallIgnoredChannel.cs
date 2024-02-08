@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Database.Models.Guilds;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
 
-namespace Database.Models.SleepCalls
+namespace TsubaHaru.FleckyBot.Database.Models.SleepCalls
 {
     public class SleepCallIgnoredChannel
     {

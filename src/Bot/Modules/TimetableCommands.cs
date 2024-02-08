@@ -2,13 +2,12 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
-using Database.Models.Guilds;
 using Microsoft.EntityFrameworkCore;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
 
-namespace Bot.Modules
+namespace TsubaHaru.FleckyBot.Bot.Modules
 {
     [Group("timetable", "Timetable related stuff")]
     public class TimetableCommands : InteractionModuleBase<SocketInteractionContext>

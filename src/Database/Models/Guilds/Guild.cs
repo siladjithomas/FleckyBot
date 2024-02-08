@@ -1,7 +1,7 @@
-using Database.Models.SleepCalls;
 using System.ComponentModel.DataAnnotations;
+using TsubaHaru.FleckyBot.Database.Models.SleepCalls;
 
-namespace Database.Models.Guilds;
+namespace TsubaHaru.FleckyBot.Database.Models.Guilds;
 
 public class Guild
 {

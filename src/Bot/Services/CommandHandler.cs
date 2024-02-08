@@ -1,10 +1,9 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot;
-using Bot.Models;
+using TsubaHaru.FleckyBot.Bot.Models;
 
-namespace Bot.Services;
+namespace TsubaHaru.FleckyBot.Bot.Services;
 
 public class CommandHandler
 {

@@ -1,23 +1,21 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
-using Serilog;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("birthday", "This group is used for bithday related things")]
 public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionContext>
 {
     public InteractionService commands { get; set; }
     private readonly CommandHandler _handler;
-    private readonly ILogger<Worker> _logger;
+    private readonly ILogger<BirthdayUserCommands> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public BirthdayUserCommands(InteractionService service, CommandHandler handler, ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
+    public BirthdayUserCommands(InteractionService service, CommandHandler handler, ILogger<BirthdayUserCommands> logger, IServiceScopeFactory scopeFactory)
     {
         commands = service;
         _handler = handler;
@@ -33,38 +31,35 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
 
         await DeferAsync(ephemeral: true);
 
-        string userInQuestionName = user == null ? Context.User.Username : user.Username;
+        user ??= Context.User;
 
-        // TODO: set the birthday to the user and save it
-        using (var scope = _scopeFactory.CreateScope())
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        await using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+        BirthdayUser? birthdayUser = dbContext.BirthdayUser?.FirstOrDefault(x => x.GuildId == Context.Guild.Id && x.UserId == user.Id);
+
+        if (birthdayUser == null)
         {
-            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-
-            ulong userInQuestion = user == null ? Context.User.Id : user.Id;
-
-            BirthdayUser? birthdayUser = context.BirthdayUser?.Where(x => x.GuildId == Context.Guild.Id && x.UserId == userInQuestion).FirstOrDefault();
-
-            if (birthdayUser == null)
+            BirthdayUser newBirthdayUser = new BirthdayUser
             {
-                BirthdayUser newBirithdayUser = new BirthdayUser
-                {
-                    GuildId = Context.Guild.Id,
-                    UserId = userInQuestion,
-                    Birthday = birthday
-                };
+                GuildId = Context.Guild.Id,
+                GuildName = Context.Guild.Name,
+                UserId = user.Id,
+                UserName = user.GlobalName,
+                Birthday = birthday
+            };
 
-                context.BirthdayUser?.Add(newBirithdayUser);
-                context.SaveChanges();
-            }
-            else
-            {
-                birthdayUser.Birthday = birthday;
-                context.BirthdayUser?.Update(birthdayUser);
-                context.SaveChanges();
-            }
+            dbContext.BirthdayUser?.Add(newBirthdayUser);
+            await dbContext.SaveChangesAsync();
+        }
+        else
+        {
+            birthdayUser.Birthday = birthday;
+            dbContext.BirthdayUser?.Update(birthdayUser);
+            await dbContext.SaveChangesAsync();
         }
 
-        await FollowupAsync($"Birthday of user {userInQuestionName} has been set to {birthday.ToString()}");
+        await FollowupAsync($"Birthday of user {user.GlobalName} has been set to {birthday}");
     }
 
     [SlashCommand("get", "Get the birthday of the current user or the set user")]
@@ -75,26 +70,17 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
 
         await DeferAsync(ephemeral: true);
 
-        string userInQuestionName = user == null ? Context.User.Username : user.Username;
+        user ??= Context.User;
 
-        DateTime? setBirthday = null;
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        await using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-        using (var scope = _scopeFactory.CreateScope())
-        {
-            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+        BirthdayUser? birthdayUser = dbContext.BirthdayUser?.FirstOrDefault(x => x.GuildId == Context.Guild.Id && x.UserId == user.Id);
 
-            ulong userInQuestion = user == null ? Context.User.Id : user.Id;
-
-            BirthdayUser? birthdayUser = context.BirthdayUser?.Where(x => x.GuildId == Context.Guild.Id && x.UserId == userInQuestion).FirstOrDefault();
-
-            if (birthdayUser != null)
-                setBirthday = birthdayUser.Birthday;
-        }
-
-        if (setBirthday != null)
-            await FollowupAsync($"Birthday of user {userInQuestionName} is set to {setBirthday.ToString()}");
+        if (birthdayUser != null)
+            await FollowupAsync($"Birthday of user {Context.User.GlobalName} is set to {birthdayUser.Birthday}");
         else
-            await FollowupAsync($"Birthday of user {userInQuestionName} is not set.");
+            await FollowupAsync($"Birthday of user {Context.User.GlobalName} is not set.");
     }
 
     [SlashCommand("getall", "Get all birthdays of the members in this guild")]
@@ -139,14 +125,10 @@ public class BirthdayUserCommands : InteractionModuleBase<SocketInteractionConte
 
         await DeferAsync(ephemeral: true);
 
-        List<BirthdayUser>? allBirthdays = null;
+        await using var scope = _scopeFactory.CreateAsyncScope();
+        await using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-        using (var scope = _scopeFactory.CreateScope())
-        {
-            ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-
-            allBirthdays = context.BirthdayUser?.ToList();
-        }
+        List<BirthdayUser>? allBirthdays = dbContext.BirthdayUser?.ToList();
 
         var embed = new EmbedBuilder()
             .WithTitle("All birthdays on all servers")

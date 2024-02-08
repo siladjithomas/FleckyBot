@@ -1,4 +1,4 @@
-namespace Bot.Models;
+namespace TsubaHaru.FleckyBot.Bot.Models;
 
 public class BotSettings
 {

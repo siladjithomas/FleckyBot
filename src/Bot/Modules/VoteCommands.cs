@@ -1,15 +1,14 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Discord.Rest;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Database.Models.Guilds;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("votes", "The group for all vote related stuff")]
 public class VoteCommands : InteractionModuleBase<SocketInteractionContext>

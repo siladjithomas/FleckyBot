@@ -1,5 +1,7 @@
 using Quartz;
 
+namespace TsubaHaru.FleckyBot.Bot.Services;
+
 public static class ServiceCollectionQuartzConfiguratorExtensions
 {
     public static void AddJobAndTrigger<T>(

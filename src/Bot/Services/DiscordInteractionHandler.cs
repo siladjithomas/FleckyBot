@@ -1,23 +1,14 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot.Models;
-using Database.DatabaseContexts;
-using Database.Models;
-using Victoria;
-using Victoria.Node;
-using Victoria.Node.EventArgs;
-using Victoria.Player;
-using Victoria.Responses.Search;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Reflection.Emit;
-using Database.Models.Guilds;
-using Database.Models.SleepCalls;
-using System;
-using System.Data;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
+using TsubaHaru.FleckyBot.Database.Models.SleepCalls;
+using TsubaHaru.FleckyBot.VRChat.Services;
 
-namespace Bot.Services;
+namespace TsubaHaru.FleckyBot.Bot.Services;
 
 public class InteractionHandler
 {
@@ -753,7 +744,7 @@ public class InteractionHandler
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
-            Vote? vote = context.Vote.Where(x => x.MessageId == component.Message.Id)
+            Vote? vote = context.Vote?.Where(x => x.MessageId == component.Message.Id)
                 .Include(y => y.VoteByUser)
                 .FirstOrDefault();
 
@@ -892,7 +883,7 @@ public class InteractionHandler
         using (var scope = _scopeFactory.CreateScope())
         {
             ApplicationContext context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-            Guild? guild = context.Guilds.Where(x => x.GuildId == component.GuildId)
+            Guild? guild = context.Guilds?.Where(x => x.GuildId == component.GuildId)
                 .Include(y => y.GuildTicketsChannel)
                 .ThenInclude(z => z.GuildTicketsGroups)
                 .FirstOrDefault();

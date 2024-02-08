@@ -1,12 +1,11 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using Image = TsubaHaru.FleckyBot.Database.Models.Image;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("images", "Get some images for... idk... whatever you wish.")]
 public class ImageCommands : InteractionModuleBase<SocketInteractionContext>
@@ -48,7 +47,7 @@ public class ImageCommands : InteractionModuleBase<SocketInteractionContext>
             Random rand = new Random();
             int skipper = rand.Next(1, context.Images.Count());
 
-            Database.Models.Image image = context.Images.Where(x => x.Type == choice).OrderBy(y => Guid.NewGuid()).Take(1).First();
+            Image image = context.Images.Where(x => x.Type == choice).OrderBy(y => Guid.NewGuid()).Take(1).First();
 
             var description = $"{user.Mention}";
 

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Database.Models.Guilds
+﻿namespace TsubaHaru.FleckyBot.Database.Models.Guilds
 {
     public class GuildTicketsChannel : GuildChannel
     {

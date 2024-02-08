@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Database.Models.SleepCalls
+namespace TsubaHaru.FleckyBot.Database.Models.SleepCalls
 {
     public class SleepCallActiveChannel
     {

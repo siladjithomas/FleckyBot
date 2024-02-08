@@ -1,8 +1,4 @@
 using Bot;
-using Bot.Models;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Services;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
@@ -12,6 +8,12 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Victoria;
 using Quartz;
+using TsubaHaru.FleckyBot.Bot;
+using TsubaHaru.FleckyBot.Bot.Models;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.VRChat.Models;
+using TsubaHaru.FleckyBot.VRChat.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration((hostContext) =>
@@ -78,7 +80,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddDbContext<ApplicationContext>(options => 
         {
-            options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("Bot"));
+            options.UseSqlServer(hostContext.Configuration.GetConnectionString("ConnectionString"), b => b.MigrationsAssembly("TsubaHaru.FleckyBot.Bot"));
             
             //options.EnableSensitiveDataLogging(true);
         });

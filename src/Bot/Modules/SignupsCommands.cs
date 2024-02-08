@@ -1,12 +1,10 @@
-using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Discord.Rest;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("signup", "This group is used for signups")]
 public class SignupsCommands : InteractionModuleBase<SocketInteractionContext>

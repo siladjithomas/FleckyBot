@@ -1,12 +1,12 @@
-using Discord;
-using Discord.WebSocket;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using Discord;
+using Discord.WebSocket;
 using Victoria.Node;
 using Victoria.Node.EventArgs;
 using Victoria.Player;
 
-namespace Bot.Services;
+namespace TsubaHaru.FleckyBot.Bot.Services;
 
 public sealed class AudioService
 {

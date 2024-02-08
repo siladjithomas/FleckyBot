@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Database.Models;
+namespace TsubaHaru.FleckyBot.Database.Models;
 
 public class RequestableRole
 {

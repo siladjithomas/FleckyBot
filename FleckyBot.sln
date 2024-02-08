@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "src\Bot\Bot.csproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "src\Database\Database.csproj", "{018D7B44-3738-4C3E-BCE7-52322D872BDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRChat", "src\VRChat\VRChat.csproj", "{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{018D7B44-3738-4C3E-BCE7-52322D872BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{018D7B44-3738-4C3E-BCE7-52322D872BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{018D7B44-3738-4C3E-BCE7-52322D872BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,5 +36,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A4C4468F-E2C0-4C4F-8982-D026D2200FBA} = {842E595F-3ACF-43B9-9D3A-E39B5C99A002}
 		{018D7B44-3738-4C3E-BCE7-52322D872BDF} = {842E595F-3ACF-43B9-9D3A-E39B5C99A002}
+		{6CF0D3C1-815C-49AC-8C6C-176CDCCF2CD3} = {842E595F-3ACF-43B9-9D3A-E39B5C99A002}
 	EndGlobalSection
 EndGlobal

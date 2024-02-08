@@ -1,12 +1,12 @@
-﻿using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models.Guilds;
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
 
-namespace Bot.Modules
+namespace TsubaHaru.FleckyBot.Bot.Modules
 {
     [Group("rules", "Group for roles related commands")]
     public class RuleCommands : InteractionModuleBase<SocketInteractionContext>

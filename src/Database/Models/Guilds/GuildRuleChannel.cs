@@ -1,4 +1,4 @@
-﻿namespace Database.Models.Guilds
+﻿namespace TsubaHaru.FleckyBot.Database.Models.Guilds
 {
     public class GuildRuleChannel : GuildChannel
     {

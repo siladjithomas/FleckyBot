@@ -8,11 +8,12 @@
     <RestoreAdditionalProjectSources>
       https://www.myget.org/F/yucked/api/v3/index.json
     </RestoreAdditionalProjectSources>
+    <AssemblyName>TsubaHaru.FleckyBot.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>TsubaHaru.FleckyBot.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.13.0" />
-    <PackageReference Include="Mailkit" Version="4.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
@@ -29,7 +30,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
@@ -45,6 +46,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\VRChat\VRChat.csproj" />
   </ItemGroup>
 
   <ItemGroup>

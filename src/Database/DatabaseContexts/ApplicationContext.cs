@@ -1,10 +1,11 @@
-using Database.Models;
-using Database.Models.Guilds;
-using Database.Models.SleepCalls;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using TsubaHaru.FleckyBot.Database.Models;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
+using TsubaHaru.FleckyBot.Database.Models.SleepCalls;
+using static System.String;
 
-namespace Database.DatabaseContexts;
+namespace TsubaHaru.FleckyBot.Database.DatabaseContexts;
 
 public class ApplicationContext : DbContext
 {
@@ -225,7 +226,7 @@ public class ApplicationContext : DbContext
                 var combinedQuotes = "";
                 
                 if (quote.quote != null)
-                    combinedQuotes = String.Join(@"\n", quote.quote);
+                    combinedQuotes = Join(@"\n", quote.quote);
                 
                 if (quote.author != null)
                     quotesInList.Add(new Quote

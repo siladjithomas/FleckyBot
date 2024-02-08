@@ -1,17 +1,12 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Bot;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
-using Victoria;
+using TsubaHaru.FleckyBot.Bot.Services;
 using Victoria.Node;
-using Victoria.Node.EventArgs;
 using Victoria.Player;
 using Victoria.Responses.Search;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("audio", "A group for audio related commands")]
 public class AudioCommands : InteractionModuleBase<SocketInteractionContext>

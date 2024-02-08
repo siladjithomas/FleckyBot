@@ -1,11 +1,10 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models;
 
-namespace Bot.Modules;
+namespace TsubaHaru.FleckyBot.Bot.Modules;
 
 [Group("quotes", "This is the group related to quotes")]
 public class QuoteCommands : InteractionModuleBase<SocketInteractionContext>

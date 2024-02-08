@@ -1,12 +1,12 @@
-﻿using Bot.Services;
-using Database.DatabaseContexts;
-using Database.Models.Guilds;
-using Database.Models.SleepCalls;
-using Discord.Interactions;
+﻿using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
+using TsubaHaru.FleckyBot.Database.Models.SleepCalls;
 
-namespace Bot.Modules
+namespace TsubaHaru.FleckyBot.Bot.Modules
 {
     [Group("sleep", "Sleep related commands")]
     public class SleepCommands : InteractionModuleBase<SocketInteractionContext>

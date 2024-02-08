@@ -1,11 +1,11 @@
-﻿using Database.DatabaseContexts;
-using Database.Models.Guilds;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using TsubaHaru.FleckyBot.Database.DatabaseContexts;
+using TsubaHaru.FleckyBot.Database.Models.Guilds;
 
-namespace Bot.Services
+namespace TsubaHaru.FleckyBot.Bot.Services
 {
     public class TimetableService : IJob
     {
@@ -38,7 +38,7 @@ namespace Bot.Services
 
                     if (guild.GuildTimetableChannel != null && guild.GuildTimetableLines != null && guild.GuildTimetableLines.Count > 0)
                     {
-                        SocketGuild socketGuild = _client.Guilds.Where(x => x.Id == guild.GuildId).First() ?? throw new Exception("Guild was not found on discord.");
+                        SocketGuild socketGuild = _client.Guilds?.Where(x => x.Id == guild.GuildId).First() ?? throw new Exception("Guild was not found on discord.");
 
                         foreach (GuildTimetableLine line in guild.GuildTimetableLines.ToList())
                         {
