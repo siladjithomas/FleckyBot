@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using TsubaHaru.FleckyBot.Bot.Models;
 using TsubaHaru.FleckyBot.Bot.Services;
+using TsubaHaru.FleckyBot.VRChat.Services;
 
 namespace TsubaHaru.FleckyBot.Bot;
 
@@ -16,6 +17,7 @@ public class Worker : BackgroundService
     private readonly BotSettings _settings;
     private readonly CommandHandler _handler;
     private readonly InteractionHandler _interaction;
+    private readonly VRChatService _vrChatService;
 
     private IServiceScope? _scope;
 
@@ -24,7 +26,8 @@ public class Worker : BackgroundService
         DiscordSocketClient? client,
         InteractionService? commands,
         BotSettings? settings,
-        InteractionHandler? interaction)
+        InteractionHandler? interaction,
+        VRChatService vrChatService)
     {
         _logger = logger;
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -32,6 +35,7 @@ public class Worker : BackgroundService
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _interaction = interaction ?? throw new ArgumentNullException(nameof(interaction));
+        _vrChatService = vrChatService ?? throw new ArgumentNullException(nameof(vrChatService));
 
         _handler = new CommandHandler(_client, _commands, _provider, _settings, _logger);
     }
@@ -53,6 +57,10 @@ public class Worker : BackgroundService
             await _commands.AddModulesAsync(typeof(Worker).Assembly, _scope.ServiceProvider);
 
             await StartClientAsync(stoppingToken);
+
+            var foundUser = _vrChatService.SearchUser("TsubaHaru");
+
+            _logger.LogDebug("Found user {displayName} with ID {userId}", foundUser["DisplayName"], foundUser["Id"]);
         }
         catch (Exception ex) when (!(ex is TaskCanceledException))
         {

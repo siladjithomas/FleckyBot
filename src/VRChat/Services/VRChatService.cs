@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Security;
+using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using OtpNet;
 using TsubaHaru.FleckyBot.VRChat.Models;
@@ -14,6 +16,7 @@ public class VRChatService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly VRChatSettings _settings;
     private readonly Configuration _configuration;
+    private AuthenticationApi? _authApi;
 
     public VRChatService(ILogger<VRChatService> logger, IServiceScopeFactory scopeFactory, VRChatSettings settings)
     {
@@ -23,43 +26,107 @@ public class VRChatService
 
         _configuration = new Configuration
         {
+            BasePath = "https://api.vrchat.cloud/api/1",
             Username = settings.Username,
             Password = settings.Password,
-            UserAgent = "FleckyBot/2.1.0 hello@tsuyabashi.dev"
+            UserAgent = "FleckyBot/2.1.0 helloATtsuyabashi.dev"
         };
     }
 
-    public async Task Authenticate()
+    private void Authenticate()
     {
         try
         {
-            AuthenticationApi authApi = new AuthenticationApi(_configuration);
-            CurrentUser currentUser = await authApi.GetCurrentUserAsync();
+            _authApi = new AuthenticationApi(_configuration);
+            CurrentUser currentUser = _authApi.GetCurrentUser();
 
             if (currentUser == null)
             {
                 // TODO: get the latest totp token
-                Totp oneTime = new Totp(Base32Encoding.ToBytes(_settings.AuthSecret));
+                Totp totpCode = new Totp(Base32Encoding.ToBytes(_settings.AuthSecret));
 
-                var remainingSeconds = oneTime.RemainingSeconds();
+                var remainingSeconds = totpCode.RemainingSeconds();
                 if (remainingSeconds < 5)
                 {
                     Thread.Sleep(TimeSpan.FromSeconds(remainingSeconds + 1));
                 }
 
-                var result = await authApi.Verify2FAAsync(new TwoFactorAuthCode(oneTime.ComputeTotp()));
+                var result = _authApi.Verify2FA(new TwoFactorAuthCode(totpCode.ComputeTotp()));
 
                 if (result.Verified)
                 {
-                    currentUser = await authApi.GetCurrentUserAsync();
+                    _authApi = new AuthenticationApi(_configuration);
+                    currentUser = _authApi.GetCurrentUser();
+
+                    _logger.LogInformation("Successfully logged in as {vrChatUser}.", currentUser.DisplayName);
                 }
             }
         }
         catch (ApiException e)
         {
-            _logger.LogError("Exception when calling API: {0}", e.Message);
-            _logger.LogError("Status Code: {0}", e.ErrorCode);
-            _logger.LogDebug(e.ToString());
+            _logger.LogError("Exception when calling API: {errMsg}", e.Message);
         }
+    }
+
+    public Dictionary<string, string> SearchUser(string displayName)
+    {
+        if (_authApi?.GetCurrentUser() == null)
+            Authenticate();
+
+        try
+        {
+            UsersApi usersApi = new UsersApi(_configuration);
+
+            var listOfUsers = usersApi.SearchUsers(displayName);
+
+            if (listOfUsers != null && listOfUsers.Count > 0)
+            {
+                LimitedUser user = listOfUsers.First();
+
+                var userDictionary = new Dictionary<string, string>
+                {
+                    { nameof(user.Id), user.Id },
+                    { nameof(user.DisplayName), user.DisplayName }
+                };
+
+                return userDictionary;
+            }
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError("Exception when calling API: {errMsg}", e.Message); ;
+        }
+
+        return new Dictionary<string, string>();
+    }
+
+    public Dictionary<string, string> GetUser(string userId)
+    {
+        if (_authApi?.GetCurrentUser() == null)
+            Authenticate();
+
+        try
+        {
+            UsersApi usersApi = new UsersApi(_configuration);
+
+            var user = usersApi.GetUser(userId);
+
+            if (user != null)
+            {
+                var userDictionary = new Dictionary<string, string>
+                {
+                    { nameof(user.Id), user.Id },
+                    { nameof(user.DisplayName), user.DisplayName }
+                };
+
+                return userDictionary;
+            }
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError("Exception when calling API: {errMsg}", e.Message); ;
+        }
+
+        return new Dictionary<string, string>();
     }
 }
