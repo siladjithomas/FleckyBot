@@ -57,10 +57,6 @@ public class Worker : BackgroundService
             await _commands.AddModulesAsync(typeof(Worker).Assembly, _scope.ServiceProvider);
 
             await StartClientAsync(stoppingToken);
-
-            var foundUser = _vrChatService.SearchUser("TsubaHaru");
-
-            _logger.LogDebug("Found user {displayName} with ID {userId}", foundUser["DisplayName"], foundUser["Id"]);
         }
         catch (Exception ex) when (!(ex is TaskCanceledException))
         {

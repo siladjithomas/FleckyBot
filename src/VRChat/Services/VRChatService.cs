@@ -116,7 +116,10 @@ public class VRChatService
                 var userDictionary = new Dictionary<string, string>
                 {
                     { nameof(user.Id), user.Id },
-                    { nameof(user.DisplayName), user.DisplayName }
+                    { nameof(user.DisplayName), user.DisplayName },
+                    { nameof(user.Bio), user.Bio },
+                    { nameof(user.CurrentAvatarThumbnailImageUrl), user.ProfilePicOverride != string.Empty ? user.ProfilePicOverride : user.CurrentAvatarThumbnailImageUrl },
+                    { nameof(user.CurrentAvatarImageUrl), user.CurrentAvatarImageUrl }
                 };
 
                 return userDictionary;
