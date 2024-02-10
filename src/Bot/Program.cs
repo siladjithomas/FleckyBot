@@ -76,7 +76,6 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(new DiscordSocketClient(discordSocketConfig));
         services.AddSingleton(provider => new InteractionService(provider.GetRequiredService<DiscordSocketClient>()));
         services.AddSingleton<CommandHandler>();
-        // TODO: Properly implement the mail service for vrchat 2fa code
         services.AddSingleton<MailService>();
         services.AddSingleton<VRChatService>();
         services.AddSingleton<InteractionHandler>();
@@ -89,8 +88,6 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         services.AddHostedService<Worker>();
-
-        // TODO: Set up so it uses the host settings from TelegramBot project
     })
     .UseSystemd()
     .Build();

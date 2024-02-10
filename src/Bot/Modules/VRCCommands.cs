@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.Rest;
+using Discord.WebSocket;
 using TsubaHaru.FleckyBot.Bot.Services;
 using TsubaHaru.FleckyBot.VRChat.Services;
 
@@ -14,9 +16,9 @@ namespace TsubaHaru.FleckyBot.Bot.Modules
         private readonly ILogger<VRCCommands> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public VRCCommands(InteractionService commands, CommandHandler handler, VRChatService vrcService, ILogger<VRCCommands> logger, IServiceScopeFactory scopeFactory)
+        public VRCCommands(InteractionService service, CommandHandler handler, VRChatService vrcService, ILogger<VRCCommands> logger, IServiceScopeFactory scopeFactory)
         {
-            this.commands = commands;
+            commands = service;
             _handler = handler;
             _logger = logger;
             _scopeFactory = scopeFactory;
