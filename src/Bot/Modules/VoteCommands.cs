@@ -80,6 +80,8 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
             .WithButton(buttonNo)
             .WithButton(buttonClose);
 
+        var tran = await dbContext.Database.BeginTransactionAsync();
+
         if (channel != null)
         {
             RestUserMessage message = await channel.SendMessageAsync(embed: embed.Build(), components: buttonComponent.Build());
@@ -96,10 +98,14 @@ public class VoteCommands : InteractionModuleBase<SocketInteractionContext>
 
             await dbContext.SaveChangesAsync();
 
+            await tran.CommitAsync();
+
             await FollowupAsync($"Vote has been created in channel {channel.Mention}", allowedMentions: AllowedMentions.All);
         }
         else
         {
+            await tran.RollbackAsync();
+            
             await FollowupAsync("Vote could not be created. Channel was not found in Guild.");
         }
     }
