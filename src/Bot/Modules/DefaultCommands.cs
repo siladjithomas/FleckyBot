@@ -159,4 +159,14 @@ public class DefaultCommands : InteractionModuleBase<SocketInteractionContext>
         
         await FollowupAsync("Wrote messages in log.");
     }
+
+    [MessageCommand("Get Mail")]
+    public async Task TestMessageInteraction(IMessage msg)
+    {
+        await DeferAsync(ephemeral: true);
+
+        _logger.LogInformation("{func} has been run in channel {channelId}", nameof(TestMessageInteraction), msg.Id);
+
+        await FollowupAsync("Hello there.");
+    }
 }
