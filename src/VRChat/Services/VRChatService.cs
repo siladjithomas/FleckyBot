@@ -42,16 +42,9 @@ public class VRChatService
 
             if (currentUser == null)
             {
-                // TODO: get the latest totp token
-                Totp totpCode = new Totp(Base32Encoding.ToBytes(_settings.AuthSecret));
+                var token = ComputeTotpToken();
 
-                var remainingSeconds = totpCode.RemainingSeconds();
-                if (remainingSeconds < 5)
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(remainingSeconds + 1));
-                }
-
-                var result = _authApi.Verify2FA(new TwoFactorAuthCode(totpCode.ComputeTotp()));
+                var result = _authApi.Verify2FA(new TwoFactorAuthCode(token));
 
                 if (result.Verified)
                 {
@@ -131,5 +124,18 @@ public class VRChatService
         }
 
         return new Dictionary<string, string>();
+    }
+
+    public string ComputeTotpToken()
+    {
+        Totp totpCode = new Totp(Base32Encoding.ToBytes(_settings.AuthSecret));
+
+        var remainingSeconds = totpCode.RemainingSeconds();
+        if (remainingSeconds < 5)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(remainingSeconds + 1));
+        }
+
+        return totpCode.ComputeTotp();
     }
 }

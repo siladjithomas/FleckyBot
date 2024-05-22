@@ -43,5 +43,16 @@ namespace TsubaHaru.FleckyBot.Bot.Modules
 
             await FollowupAsync("User found.", embed: vrcEmbed.Build(), ephemeral: true);
         }
+
+        [RequireOwner]
+        [SlashCommand("getcurrenttoken", "Get the current auth token")]
+        public async Task GetCurrentToken()
+        {
+            await DeferAsync(ephemeral: true);
+
+            var currentToken = _vrcService.ComputeTotpToken();
+
+            await FollowupAsync($"The current token is: {currentToken}");
+        }
     }
 }
